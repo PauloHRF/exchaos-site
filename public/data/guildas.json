@@ -1,0 +1,197 @@
+{
+  "versao": 4,
+  "guildas": [
+    {
+      "id": "ff7",
+      "nome": "Final Fantasy VII",
+      "era": "1997",
+      "herois": [
+        { "id": "ff7-cloud", "nome": "Cloud Strife", "classe": "Espadachim", "moral": 1, "vigor": 11, "mobilidade": 6, "carisma": 2, "intelecto": 2, "combate": 11, "traco": "duelista", "etiquetas": ["mercenario"], "recusa": [] },
+        { "id": "ff7-tifa", "nome": "Tifa Lockhart", "classe": "Lutadora", "moral": 2, "vigor": 6, "mobilidade": 8, "carisma": 5, "intelecto": 2, "combate": 11, "traco": "andarilho", "etiquetas": [], "recusa": [] },
+        { "id": "ff7-aerith", "nome": "Aerith Gainsborough", "classe": "Cetra", "moral": 3, "vigor": 4, "mobilidade": 6, "carisma": 11, "intelecto": 9, "combate": 2, "traco": "comandante", "etiquetas": ["sacro"], "recusa": ["magia-negra"] },
+        { "id": "ff7-barret", "nome": "Barret Wallace", "classe": "Artilheiro", "moral": 1, "vigor": 9, "mobilidade": 2, "carisma": 6, "intelecto": 4, "combate": 11, "traco": "veterano", "etiquetas": ["fora-da-lei"], "recusa": [] },
+        { "id": "ff7-vincent", "nome": "Vincent Valentine", "classe": "Atirador", "moral": -1, "vigor": 5, "mobilidade": 8, "carisma": 3, "intelecto": 6, "combate": 10, "traco": "duelista", "etiquetas": ["magia-negra"], "recusa": [] }
+      ]
+    },
+    {
+      "id": "hyrule",
+      "nome": "The Legend of Zelda",
+      "era": "1986",
+      "herois": [
+        { "id": "hy-link", "nome": "Link", "classe": "Cavaleiro", "moral": 3, "vigor": 9, "mobilidade": 6, "carisma": 2, "intelecto": 4, "combate": 11, "traco": "vanguarda", "etiquetas": ["sacro"], "recusa": ["morto-vivo"] },
+        { "id": "hy-zelda", "nome": "Zelda", "classe": "Princesa Sábia", "moral": 3, "vigor": 6, "mobilidade": 5, "carisma": 11, "intelecto": 8, "combate": 2, "traco": "batedor", "etiquetas": ["sacro", "realeza"], "recusa": ["magia-negra"] },
+        { "id": "hy-impa", "nome": "Impa", "classe": "Sheikah", "moral": 2, "vigor": 6, "mobilidade": 8, "carisma": 5, "intelecto": 6, "combate": 7, "traco": "retaguarda", "etiquetas": [], "recusa": [] },
+        { "id": "hy-midna", "nome": "Midna", "classe": "Crepuscular", "moral": -1, "vigor": 2, "mobilidade": 9, "carisma": 6, "intelecto": 11, "combate": 4, "traco": "decifrador", "etiquetas": ["magia-negra", "realeza"], "recusa": [] },
+        { "id": "hy-ganondorf", "nome": "Ganondorf", "classe": "Rei do Mal", "moral": -3, "vigor": 2, "mobilidade": 2, "carisma": 11, "intelecto": 6, "combate": 11, "traco": "vanguarda", "etiquetas": ["magia-negra", "realeza"], "recusa": ["sacro"] }
+      ]
+    },
+    {
+      "id": "erdrea",
+      "nome": "Dragon Quest XI",
+      "era": "2017",
+      "herois": [
+        { "id": "er-onze", "nome": "Onze, o Luminário", "classe": "Herói", "moral": 3, "vigor": 8, "mobilidade": 5, "carisma": 6, "intelecto": 2, "combate": 11, "traco": "amuleto", "etiquetas": ["sacro"], "recusa": ["magia-negra"] },
+        { "id": "er-erik", "nome": "Erik", "classe": "Ladrão", "moral": 0, "vigor": 2, "mobilidade": 11, "carisma": 4, "intelecto": 6, "combate": 9, "traco": "andarilho", "etiquetas": ["fora-da-lei"], "recusa": [] },
+        { "id": "er-veronica", "nome": "Verônica", "classe": "Maga", "moral": 1, "vigor": 2, "mobilidade": 6, "carisma": 8, "intelecto": 11, "combate": 5, "traco": "amuleto", "etiquetas": [], "recusa": [] },
+        { "id": "er-serena", "nome": "Serena", "classe": "Sacerdotisa", "moral": 3, "vigor": 6, "mobilidade": 4, "carisma": 11, "intelecto": 9, "combate": 2, "traco": "diplomata", "etiquetas": ["sacro"], "recusa": ["morto-vivo"] },
+        { "id": "er-silvando", "nome": "Silvando", "classe": "Menestrel", "moral": 2, "vigor": 2, "mobilidade": 9, "carisma": 11, "intelecto": 6, "combate": 4, "traco": "comandante", "etiquetas": [], "recusa": [] }
+      ]
+    },
+    {
+      "id": "guardia",
+      "nome": "Chrono Trigger",
+      "era": "1995",
+      "herois": [
+        { "id": "gu-crono", "nome": "Crono", "classe": "Espadachim", "moral": 2, "vigor": 6, "mobilidade": 8, "carisma": 5, "intelecto": 2, "combate": 11, "traco": "veterano", "etiquetas": [], "recusa": [] },
+        { "id": "gu-marle", "nome": "Marle", "classe": "Princesa", "moral": 2, "vigor": 2, "mobilidade": 8, "carisma": 11, "intelecto": 5, "combate": 6, "traco": "vanguarda", "etiquetas": ["realeza", "sacro"], "recusa": [] },
+        { "id": "gu-lucca", "nome": "Lucca", "classe": "Inventora", "moral": 1, "vigor": 2, "mobilidade": 6, "carisma": 9, "intelecto": 11, "combate": 4, "traco": "sentinela", "etiquetas": ["maquina"], "recusa": [] },
+        { "id": "gu-glenn", "nome": "Glenn", "classe": "Cavaleiro-Rã", "moral": 3, "vigor": 11, "mobilidade": 2, "carisma": 6, "intelecto": 2, "combate": 11, "traco": "duelista", "etiquetas": ["sacro", "besta"], "recusa": ["magia-negra"] },
+        { "id": "gu-magus", "nome": "Magus", "classe": "Feiticeiro Sombrio", "moral": -2, "vigor": 2, "mobilidade": 6, "carisma": 4, "intelecto": 11, "combate": 9, "traco": "amuleto", "etiquetas": ["magia-negra"], "recusa": ["sacro"] }
+      ]
+    },
+    {
+      "id": "belmont",
+      "nome": "Castlevania",
+      "era": "1986",
+      "herois": [
+        { "id": "bl-simon", "nome": "Simon Belmont", "classe": "Caçador", "moral": 2, "vigor": 8, "mobilidade": 5, "carisma": 3, "intelecto": 6, "combate": 10, "traco": "decifrador", "etiquetas": ["sacro"], "recusa": ["morto-vivo"] },
+        { "id": "bl-alucard", "nome": "Alucard", "classe": "Dampiro", "moral": 0, "vigor": 5, "mobilidade": 8, "carisma": 3, "intelecto": 6, "combate": 10, "traco": "veterano", "etiquetas": ["morto-vivo", "realeza"], "recusa": [] },
+        { "id": "bl-richter", "nome": "Richter Belmont", "classe": "Caçador", "moral": 2, "vigor": 8, "mobilidade": 6, "carisma": 2, "intelecto": 5, "combate": 11, "traco": "vanguarda", "etiquetas": ["sacro"], "recusa": ["morto-vivo"] },
+        { "id": "bl-sypha", "nome": "Sypha Belnades", "classe": "Feiticeira", "moral": 2, "vigor": 2, "mobilidade": 6, "carisma": 9, "intelecto": 11, "combate": 4, "traco": "amuleto", "etiquetas": ["sacro"], "recusa": [] },
+        { "id": "bl-shanoa", "nome": "Shanoa", "classe": "Portadora de Glifos", "moral": 1, "vigor": 2, "mobilidade": 6, "carisma": 2, "intelecto": 11, "combate": 11, "traco": "teimoso", "etiquetas": ["sacro"], "recusa": [] }
+      ]
+    },
+    {
+      "id": "intermedias",
+      "nome": "Elden Ring",
+      "era": "2022",
+      "herois": [
+        { "id": "ti-malenia", "nome": "Malenia", "classe": "Lâmina de Miquella", "moral": 0, "vigor": 6, "mobilidade": 8, "carisma": 5, "intelecto": 3, "combate": 10, "traco": "veterano", "etiquetas": [], "recusa": [] },
+        { "id": "ti-radahn", "nome": "Radahn", "classe": "General", "moral": -1, "vigor": 11, "mobilidade": 2, "carisma": 6, "intelecto": 2, "combate": 11, "traco": "martir", "etiquetas": ["realeza"], "recusa": [] },
+        { "id": "ti-ranni", "nome": "Ranni", "classe": "Bruxa", "moral": -2, "vigor": 2, "mobilidade": 4, "carisma": 9, "intelecto": 11, "combate": 6, "traco": "estudioso", "etiquetas": ["magia-negra", "realeza"], "recusa": ["sacro"] },
+        { "id": "ti-blaidd", "nome": "Blaidd", "classe": "Lobo", "moral": 1, "vigor": 9, "mobilidade": 6, "carisma": 2, "intelecto": 4, "combate": 11, "traco": "veterano", "etiquetas": ["besta"], "recusa": [] },
+        { "id": "ti-melina", "nome": "Melina", "classe": "Donzela do Dedo", "moral": 2, "vigor": 6, "mobilidade": 6, "carisma": 8, "intelecto": 7, "combate": 5, "traco": "orador", "etiquetas": ["sacro"], "recusa": [] }
+      ]
+    },
+    {
+      "id": "archanea",
+      "nome": "Fire Emblem",
+      "era": "1990",
+      "herois": [
+        { "id": "ar-marth", "nome": "Marth", "classe": "Príncipe", "moral": 3, "vigor": 4, "mobilidade": 6, "carisma": 11, "intelecto": 2, "combate": 9, "traco": "decifrador", "etiquetas": ["realeza", "sacro"], "recusa": ["magia-negra"] },
+        { "id": "ar-lyn", "nome": "Lyn", "classe": "Espadachim das Planícies", "moral": 2, "vigor": 6, "mobilidade": 11, "carisma": 4, "intelecto": 2, "combate": 9, "traco": "retaguarda", "etiquetas": [], "recusa": [] },
+        { "id": "ar-robin", "nome": "Robin", "classe": "Tático", "moral": 1, "vigor": 3, "mobilidade": 5, "carisma": 8, "intelecto": 10, "combate": 6, "traco": "decifrador", "etiquetas": ["magia-negra"], "recusa": [] },
+        { "id": "ar-hector", "nome": "Hector", "classe": "Grande Senhor", "moral": 2, "vigor": 8, "mobilidade": 2, "carisma": 6, "intelecto": 5, "combate": 11, "traco": "sentinela", "etiquetas": ["realeza"], "recusa": [] },
+        { "id": "ar-micaiah", "nome": "Micaiah", "classe": "Vidente", "moral": 3, "vigor": 5, "mobilidade": 6, "carisma": 11, "intelecto": 8, "combate": 2, "traco": "diplomata", "etiquetas": ["sacro"], "recusa": ["morto-vivo"] }
+      ]
+    },
+    {
+      "id": "fantasmas",
+      "nome": "Persona 5",
+      "era": "2016",
+      "herois": [
+        { "id": "fa-joker", "nome": "Joker", "classe": "Ladrão Fantasma", "moral": 0, "vigor": 2, "mobilidade": 9, "carisma": 4, "intelecto": 11, "combate": 6, "traco": "estudioso", "etiquetas": ["fora-da-lei"], "recusa": ["realeza"] },
+        { "id": "fa-morgana", "nome": "Morgana", "classe": "Gato", "moral": 1, "vigor": 2, "mobilidade": 9, "carisma": 6, "intelecto": 11, "combate": 4, "traco": "amuleto", "etiquetas": ["besta", "fora-da-lei"], "recusa": [] },
+        { "id": "fa-makoto", "nome": "Makoto Niijima", "classe": "Rainha", "moral": 2, "vigor": 2, "mobilidade": 2, "carisma": 11, "intelecto": 6, "combate": 11, "traco": "diplomata", "etiquetas": ["fora-da-lei"], "recusa": [] },
+        { "id": "fa-ann", "nome": "Ann Takamaki", "classe": "Pantera", "moral": 2, "vigor": 2, "mobilidade": 9, "carisma": 11, "intelecto": 6, "combate": 4, "traco": "estudioso", "etiquetas": ["fora-da-lei"], "recusa": [] },
+        { "id": "fa-futaba", "nome": "Futaba Sakura", "classe": "Oráculo", "moral": 1, "vigor": 6, "mobilidade": 5, "carisma": 8, "intelecto": 10, "combate": 3, "traco": "decifrador", "etiquetas": ["fora-da-lei"], "recusa": [] }
+      ]
+    },
+    {
+      "id": "portal",
+      "nome": "Baldur's Gate 3",
+      "era": "2023",
+      "herois": [
+        { "id": "po-karlach", "nome": "Karlach", "classe": "Bárbara", "moral": 2, "vigor": 11, "mobilidade": 2, "carisma": 6, "intelecto": 2, "combate": 11, "traco": "teimoso", "etiquetas": [], "recusa": [] },
+        { "id": "po-shadowheart", "nome": "Shadowheart", "classe": "Clériga", "moral": 0, "vigor": 2, "mobilidade": 2, "carisma": 11, "intelecto": 11, "combate": 6, "traco": "comandante", "etiquetas": ["sacro", "magia-negra"], "recusa": [] },
+        { "id": "po-gale", "nome": "Gale", "classe": "Mago", "moral": 1, "vigor": 5, "mobilidade": 6, "carisma": 8, "intelecto": 11, "combate": 2, "traco": "teimoso", "etiquetas": [], "recusa": [] },
+        { "id": "po-astarion", "nome": "Astarion", "classe": "Ladino", "moral": -2, "vigor": 3, "mobilidade": 8, "carisma": 6, "intelecto": 10, "combate": 5, "traco": "estudioso", "etiquetas": ["morto-vivo", "fora-da-lei"], "recusa": ["sacro"] },
+        { "id": "po-laezel", "nome": "Lae'zel", "classe": "Guerreira Githyanki", "moral": 0, "vigor": 11, "mobilidade": 6, "carisma": 2, "intelecto": 2, "combate": 11, "traco": "sentinela", "etiquetas": [], "recusa": [] }
+      ]
+    },
+    {
+      "id": "teyvat",
+      "nome": "Genshin Impact",
+      "era": "2020",
+      "herois": [
+        { "id": "te-diluc", "nome": "Diluc", "classe": "Cavaleiro das Trevas", "moral": 2, "vigor": 4, "mobilidade": 11, "carisma": 6, "intelecto": 2, "combate": 9, "traco": "batedor", "etiquetas": [], "recusa": [] },
+        { "id": "te-raiden", "nome": "Raiden Shogun", "classe": "Arconte", "moral": 0, "vigor": 4, "mobilidade": 2, "carisma": 11, "intelecto": 6, "combate": 9, "traco": "comandante", "etiquetas": ["realeza"], "recusa": [] },
+        { "id": "te-zhongli", "nome": "Zhongli", "classe": "Arconte Geo", "moral": 2, "vigor": 6, "mobilidade": 3, "carisma": 10, "intelecto": 8, "combate": 5, "traco": "comandante", "etiquetas": ["realeza"], "recusa": [] },
+        { "id": "te-ganyu", "nome": "Ganyu", "classe": "Arqueira", "moral": 2, "vigor": 2, "mobilidade": 11, "carisma": 5, "intelecto": 6, "combate": 8, "traco": "andarilho", "etiquetas": ["besta"], "recusa": [] },
+        { "id": "te-venti", "nome": "Venti", "classe": "Bardo Arconte", "moral": 1, "vigor": 2, "mobilidade": 9, "carisma": 11, "intelecto": 6, "combate": 4, "traco": "diplomata", "etiquetas": ["realeza"], "recusa": [] }
+      ]
+    },
+    {
+      "id": "ivalice",
+      "nome": "Final Fantasy Tactics",
+      "era": "1997",
+      "herois": [
+        { "id": "iv-ramza", "nome": "Ramza Beoulve", "classe": "Cavaleiro", "moral": 3, "vigor": 6, "mobilidade": 2, "carisma": 11, "intelecto": 2, "combate": 11, "traco": "orador", "etiquetas": ["realeza"], "recusa": [] },
+        { "id": "iv-agrias", "nome": "Agrias Oaks", "classe": "Cavaleira Sagrada", "moral": 3, "vigor": 11, "mobilidade": 4, "carisma": 6, "intelecto": 2, "combate": 9, "traco": "sentinela", "etiquetas": ["sacro", "realeza"], "recusa": ["magia-negra"] },
+        { "id": "iv-delita", "nome": "Delita Heiral", "classe": "Rei", "moral": -2, "vigor": 2, "mobilidade": 4, "carisma": 9, "intelecto": 11, "combate": 6, "traco": "duelista", "etiquetas": ["realeza", "fora-da-lei"], "recusa": [] },
+        { "id": "iv-orlandeau", "nome": "Orlandeau", "classe": "Trovão Divino", "moral": 2, "vigor": 11, "mobilidade": 2, "carisma": 6, "intelecto": 4, "combate": 9, "traco": "sentinela", "etiquetas": [], "recusa": [] },
+        { "id": "iv-mustadio", "nome": "Mustadio Bunansa", "classe": "Maquinista", "moral": 2, "vigor": 5, "mobilidade": 6, "carisma": 6, "intelecto": 8, "combate": 7, "traco": "estudioso", "etiquetas": ["maquina"], "recusa": [] }
+      ]
+    },
+    {
+      "id": "spira",
+      "nome": "Final Fantasy X",
+      "era": "2001",
+      "herois": [
+        { "id": "sp-tidus", "nome": "Tidus", "classe": "Blitzer", "moral": 2, "vigor": 6, "mobilidade": 11, "carisma": 4, "intelecto": 2, "combate": 9, "traco": "andarilho", "etiquetas": [], "recusa": [] },
+        { "id": "sp-yuna", "nome": "Yuna", "classe": "Invocadora", "moral": 3, "vigor": 6, "mobilidade": 4, "carisma": 9, "intelecto": 11, "combate": 2, "traco": "vanguarda", "etiquetas": ["sacro"], "recusa": ["morto-vivo"] },
+        { "id": "sp-auron", "nome": "Auron", "classe": "Guardião", "moral": 1, "vigor": 5, "mobilidade": 2, "carisma": 6, "intelecto": 11, "combate": 8, "traco": "andarilho", "etiquetas": ["morto-vivo"], "recusa": [] },
+        { "id": "sp-lulu", "nome": "Lulu", "classe": "Maga Negra", "moral": 0, "vigor": 2, "mobilidade": 11, "carisma": 11, "intelecto": 6, "combate": 2, "traco": "batedor", "etiquetas": ["magia-negra"], "recusa": [] },
+        { "id": "sp-wakka", "nome": "Wakka", "classe": "Blitzer", "moral": 2, "vigor": 5, "mobilidade": 11, "carisma": 8, "intelecto": 2, "combate": 6, "traco": "retaguarda", "etiquetas": ["sacro"], "recusa": [] }
+      ]
+    },
+    {
+      "id": "kaermorhen",
+      "nome": "The Witcher",
+      "era": "2007",
+      "herois": [
+        { "id": "km-geralt", "nome": "Geralt de Rívia", "classe": "Bruxo", "moral": 0, "vigor": 4, "mobilidade": 11, "carisma": 2, "intelecto": 6, "combate": 9, "traco": "retaguarda", "etiquetas": ["mercenario"], "recusa": [] },
+        { "id": "km-yennefer", "nome": "Yennefer", "classe": "Feiticeira", "moral": -1, "vigor": 2, "mobilidade": 11, "carisma": 6, "intelecto": 9, "combate": 4, "traco": "retaguarda", "etiquetas": ["magia-negra"], "recusa": [] },
+        { "id": "km-ciri", "nome": "Ciri", "classe": "Fonte", "moral": 2, "vigor": 2, "mobilidade": 11, "carisma": 6, "intelecto": 4, "combate": 9, "traco": "batedor", "etiquetas": ["realeza"], "recusa": [] },
+        { "id": "km-triss", "nome": "Triss Merigold", "classe": "Feiticeira", "moral": 2, "vigor": 2, "mobilidade": 11, "carisma": 9, "intelecto": 6, "combate": 4, "traco": "duelista", "etiquetas": ["magia-negra"], "recusa": [] },
+        { "id": "km-vesemir", "nome": "Vesemir", "classe": "Bruxo Ancião", "moral": 1, "vigor": 11, "mobilidade": 5, "carisma": 2, "intelecto": 6, "combate": 8, "traco": "teimoso", "etiquetas": ["mercenario"], "recusa": [] }
+      ]
+    },
+    {
+      "id": "ferelden",
+      "nome": "Dragon Age: Origins",
+      "era": "2009",
+      "herois": [
+        { "id": "fe-alistair", "nome": "Alistair", "classe": "Guarda Cinzento", "moral": 3, "vigor": 11, "mobilidade": 2, "carisma": 6, "intelecto": 2, "combate": 11, "traco": "martir", "etiquetas": ["sacro", "realeza"], "recusa": ["magia-negra"] },
+        { "id": "fe-morrigan", "nome": "Morrigan", "classe": "Bruxa das Terras Selvagens", "moral": -2, "vigor": 2, "mobilidade": 11, "carisma": 6, "intelecto": 9, "combate": 4, "traco": "batedor", "etiquetas": ["magia-negra", "besta"], "recusa": ["sacro"] },
+        { "id": "fe-leliana", "nome": "Leliana", "classe": "Barda", "moral": 1, "vigor": 5, "mobilidade": 8, "carisma": 7, "intelecto": 6, "combate": 6, "traco": "diplomata", "etiquetas": ["sacro", "fora-da-lei"], "recusa": [] },
+        { "id": "fe-sten", "nome": "Sten", "classe": "Qunari", "moral": 0, "vigor": 8, "mobilidade": 5, "carisma": 6, "intelecto": 6, "combate": 7, "traco": "teimoso", "etiquetas": [], "recusa": [] },
+        { "id": "fe-wynne", "nome": "Wynne", "classe": "Feiticeira Anciã", "moral": 3, "vigor": 11, "mobilidade": 2, "carisma": 9, "intelecto": 6, "combate": 4, "traco": "martir", "etiquetas": ["sacro"], "recusa": ["magia-negra"] }
+      ]
+    },
+    {
+      "id": "tamriel",
+      "nome": "Skyrim",
+      "era": "2011",
+      "herois": [
+        { "id": "ta-dovahkiin", "nome": "Nascido do Dragão", "classe": "Dovahkiin", "moral": 1, "vigor": 11, "mobilidade": 2, "carisma": 6, "intelecto": 2, "combate": 11, "traco": "vinganca", "etiquetas": [], "recusa": [] },
+        { "id": "ta-serana", "nome": "Serana", "classe": "Vampira", "moral": -1, "vigor": 2, "mobilidade": 11, "carisma": 6, "intelecto": 9, "combate": 4, "traco": "orador", "etiquetas": ["morto-vivo", "magia-negra"], "recusa": [] },
+        { "id": "ta-lydia", "nome": "Lydia", "classe": "Escudeira", "moral": 2, "vigor": 11, "mobilidade": 5, "carisma": 6, "intelecto": 2, "combate": 8, "traco": "martir", "etiquetas": [], "recusa": [] },
+        { "id": "ta-paarthurnax", "nome": "Paarthurnax", "classe": "Dragão", "moral": 2, "vigor": 11, "mobilidade": 2, "carisma": 4, "intelecto": 6, "combate": 9, "traco": "martir", "etiquetas": ["besta"], "recusa": [] },
+        { "id": "ta-delphine", "nome": "Delphine", "classe": "Lâmina", "moral": 0, "vigor": 3, "mobilidade": 10, "carisma": 5, "intelecto": 6, "combate": 8, "traco": "orador", "etiquetas": ["fora-da-lei"], "recusa": [] }
+      ]
+    },
+    {
+      "id": "bionis",
+      "nome": "Xenoblade Chronicles",
+      "era": "2010",
+      "herois": [
+        { "id": "bi-shulk", "nome": "Shulk", "classe": "Vidente da Monado", "moral": 3, "vigor": 11, "mobilidade": 5, "carisma": 2, "intelecto": 8, "combate": 6, "traco": "orador", "etiquetas": [], "recusa": [] },
+        { "id": "bi-reyn", "nome": "Reyn", "classe": "Defensor", "moral": 2, "vigor": 11, "mobilidade": 4, "carisma": 6, "intelecto": 2, "combate": 9, "traco": "vinganca", "etiquetas": [], "recusa": [] },
+        { "id": "bi-sharla", "nome": "Sharla", "classe": "Atiradora Médica", "moral": 2, "vigor": 10, "mobilidade": 3, "carisma": 8, "intelecto": 6, "combate": 5, "traco": "vinganca", "etiquetas": [], "recusa": [] },
+        { "id": "bi-melia", "nome": "Melia", "classe": "Princesa Alta Entia", "moral": 2, "vigor": 10, "mobilidade": 3, "carisma": 8, "intelecto": 6, "combate": 5, "traco": "vinganca", "etiquetas": ["realeza"], "recusa": [] },
+        { "id": "bi-riki", "nome": "Riki", "classe": "Nopon", "moral": 1, "vigor": 8, "mobilidade": 7, "carisma": 6, "intelecto": 5, "combate": 6, "traco": "vinganca", "etiquetas": ["besta"], "recusa": [] }
+      ]
+    }
+  ]
+}
