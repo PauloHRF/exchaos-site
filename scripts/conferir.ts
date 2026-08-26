@@ -21,6 +21,7 @@ import {
 } from '../src/regras.ts';
 import { hash, mulberry32 } from '../src/rng.ts';
 import { catalogo, dbHerois, jornadaPara, montarParty } from './comum.ts';
+import { lancesPorEixoNoDia } from './avaliar.ts';
 
 let falhas = 0;
 const conferir = (nome: string, ok: boolean, detalhe = '') => {
@@ -88,6 +89,28 @@ for (const tipo of new Set(COMPOSICAO_DA_JORNADA)) {
   conferir(`há desafios do tipo ${tipo}`, quantos >= 2, `${quantos} no catálogo`);
 }
 
+/**
+ * Nenhum eixo pode ser de descarte. Conta pelo **dia**, não pelo catálogo: a
+ * jornada sorteia três combates e só um de cada outra prova, então um lance
+ * escrito num desafio de combate vale o triplo. Foi contando pelo catálogo que
+ * o desequilíbrio passou despercebido — vigor aparecia como o eixo mais raro,
+ * e era na verdade quatro vezes menos cobrado que combate.
+ *
+ * A folga é larga de propósito: o alvo é 4,2 lances por eixo, e o que esta
+ * conferência proíbe é o buraco, não a assimetria.
+ */
+const porEixoNoDia = lancesPorEixoNoDia(catalogo);
+const MINIMO_POR_EIXO = 3.5;
+const MAXIMO_POR_EIXO = 5;
+const desprezados = EIXOS.filter(
+  (e) => porEixoNoDia[e] < MINIMO_POR_EIXO || porEixoNoDia[e] > MAXIMO_POR_EIXO,
+);
+conferir(
+  `todo eixo é cobrado entre ${MINIMO_POR_EIXO} e ${MAXIMO_POR_EIXO} vezes por dia`,
+  desprezados.length === 0,
+  EIXOS.map((e) => `${e.slice(0, 4)} ${porEixoNoDia[e].toFixed(2)}`).join(' · '),
+);
+
 const foraDoTamanho = catalogo.desafios.filter((d) => d.lances.length !== 3);
 conferir(
   'todo desafio tem exatamente 3 lances',
@@ -123,6 +146,36 @@ for (let d = 0; d < AMOSTRAS_DRAFT; d++) {
 }
 conferir(`nenhum draft trava em ${AMOSTRAS_DRAFT} tentativas`, travas === 0, `${travas} travas`);
 console.log(`        resorteios: ${(resorteiosTotais / AMOSTRAS_DRAFT).toFixed(2)} por jornada`);
+
+/**
+ * O draft precisa pagar. É a conferência mais importante do arquivo, porque é a
+ * única que falha quando o jogo continua funcionando e deixa de ser um jogo: se
+ * escolher bem e escolher mal dão no mesmo, as cinco rodadas de recrutamento são
+ * cerimônia, e nada mais aqui detecta isso.
+ *
+ * Já aconteceu uma vez — foi com todos os heróis no mesmo formato equilibrado,
+ * e só apareceu porque alguém pensou em medir o jogador que escolhe o pior
+ * candidato de cada rodada. Agora essa medida roda sempre.
+ */
+const AMOSTRAS_ESCOLHA = 400;
+function salvouOMundo(nivel: Parameters<typeof montarParty>[1]): number {
+  let salvou = 0;
+  for (let d = 0; d < AMOSTRAS_ESCOLHA; d++) {
+    const dia = `escolha-${d}`;
+    const { party } = montarParty(dia, nivel, mulberry32(hash(`${nivel}:${dia}`)));
+    if (party.length !== TAMANHO_PARTY) continue;
+    const c = simularCampanha(party, 'agressiva', dia, jornadaPara(dia));
+    if (c.vitorias === 7) salvou++;
+  }
+  return (salvou / AMOSTRAS_ESCOLHA) * 100;
+}
+const bemEscolhida = salvouOMundo('sinergico');
+const malEscolhida = salvouOMundo('pessimo');
+conferir(
+  'escolher bem paga o dobro de escolher mal',
+  bemEscolhida >= malEscolhida * 2,
+  `sinérgico ${bemEscolhida.toFixed(1)}% × péssimo ${malEscolhida.toFixed(1)}%`,
+);
 
 // Determinismo: é o que permite comparar resultados entre jogadores.
 const dia = '2026-08-13';

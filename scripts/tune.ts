@@ -13,7 +13,13 @@ import { simularCampanha, somaDoGrupo } from '../src/motor.ts';
 import { DEGRAU_DA_ETAPA, EIXOS, TATICAS } from '../src/regras.ts';
 import { hash, mulberry32 } from '../src/rng.ts';
 import type { Tatica } from '../src/tipos.ts';
-import { jornadaPara, montarParty, type Nivel } from './comum.ts';
+import { NIVEIS, jornadaPara, montarParty, type Nivel } from './comum.ts';
+import { zerarValorDaVida } from './avaliar.ts';
+
+// `--ablacao` zera o único número estimado do avaliador — o que uma vida vale em
+// lances. Se a conclusão do experimento mudar com isso, ela era do palpite e não
+// do jogo.
+if (process.argv.includes('--ablacao')) zerarValorDaVida();
 
 function medir(nivel: Nivel, tatica: Tatica, amostras: number) {
   const histograma = new Array(8).fill(0);
@@ -48,7 +54,7 @@ const AMOSTRAS = 2000;
 if (process.argv.includes('--perfil')) {
   console.log('Soma da party por eixo (máximo 50; a party sempre tem 160 pontos no total)\n');
   console.log('nível         ' + EIXOS.map((e) => e.slice(0, 6).padStart(9)).join(''));
-  for (const nivel of ['aleatorio', 'guloso', 'informado'] as Nivel[]) {
+  for (const nivel of NIVEIS) {
     const porEixo: Record<string, number[]> = Object.fromEntries(EIXOS.map((e) => [e, []]));
     for (let i = 0; i < 1500; i++) {
       const dia = `perfil-${i}`;
@@ -111,7 +117,7 @@ if (process.argv.includes('--varrer')) {
 }
 
 console.log(`\nCalibragem — ${AMOSTRAS} jornadas por linha\n`);
-for (const nivel of ['aleatorio', 'guloso', 'informado'] as Nivel[]) {
+for (const nivel of NIVEIS) {
   for (const tatica of ['agressiva', 'equilibrada', 'defensiva'] as Tatica[]) {
     const r = medir(nivel, tatica, AMOSTRAS);
     const pct = (n: number) => ((n / AMOSTRAS) * 100).toFixed(1).padStart(5) + '%';

@@ -1,5 +1,5 @@
 {
-  "versao": 2,
+  "versao": 3,
   "desafios": [
     {
       "id": "vila",
@@ -7,7 +7,7 @@
       "tipo": "combate",
       "abertura": "A fumaça é vista da estrada. Quando vocês chegam, metade já não dá para salvar.",
       "lances": [
-        { "cena": "As primeiras casas caíram, e a horda vem pela estrada principal.", "eixo": "combate", "dificuldade": 29 },
+        { "cena": "As primeiras casas caíram, e o calor da praça não deixa ninguém respirar.", "eixo": "vigor", "dificuldade": 29 },
         { "cena": "Alguém precisa tirar as crianças do celeiro antes de o fogo chegar lá.", "eixo": "mobilidade", "dificuldade": 27 },
         { "cena": "O chefe da horda para no meio da praça e chama duelo.", "eixo": "combate", "dificuldade": 31 }
       ]
@@ -32,7 +32,7 @@
       "lances": [
         { "cena": "O que está enterrado aqui não fica quieto quando alguém desce.", "eixo": "carisma", "dificuldade": 31 },
         { "cena": "Os corredores se fecham, e algo respira logo atrás.", "eixo": "combate", "dificuldade": 29 },
-        { "cena": "A cripta exige que alguém encare o que ela resolve mostrar.", "eixo": "carisma", "dificuldade": 32 }
+        { "cena": "O ar lá embaixo é velho e pesado, e vai cobrando a cada corredor.", "eixo": "vigor", "dificuldade": 32 }
       ]
     },
     {
@@ -43,7 +43,7 @@
       "lances": [
         { "cena": "Precisa achar por onde entrar sem ser pela frente.", "eixo": "intelecto", "dificuldade": 30 },
         { "cena": "O portão cede, e o pátio inteiro vem junto.", "eixo": "combate", "dificuldade": 33 },
-        { "cena": "Fogo grego nas escadas, e ninguém pode parar.", "eixo": "mobilidade", "dificuldade": 29 }
+        { "cena": "Fogo grego nas escadas, e a subida é longa demais para parar no meio.", "eixo": "vigor", "dificuldade": 29 }
       ]
     },
     {
@@ -65,7 +65,7 @@
       "lances": [
         { "cena": "Dá para fazer mil homens hesitarem, se a voz certa falar.", "eixo": "carisma", "dificuldade": 31 },
         { "cena": "A linha de frente encosta, e não há para onde recuar.", "eixo": "combate", "dificuldade": 34 },
-        { "cena": "A retirada precisa ser coberta, e isso vai custar.", "eixo": "combate", "dificuldade": 32 }
+        { "cena": "A retirada precisa ser coberta, e quem cobrir vai aguentar sozinho.", "eixo": "vigor", "dificuldade": 32 }
       ]
     },
     {
@@ -98,7 +98,7 @@
       "abertura": "Sete cadeiras, sete votos, e nenhuma vaga para quem chega pedindo.",
       "lances": [
         { "cena": "Ninguém aqui cede a palavra para quem não impõe respeito.", "eixo": "carisma", "dificuldade": 31 },
-        { "cena": "A pergunta do conclave não tem resposta certa, e eles sabem.", "eixo": "intelecto", "dificuldade": 33 },
+        { "cena": "O conclave só ouve quem ficar de pé dentro do círculo até o fim.", "eixo": "vigor", "dificuldade": 33 },
         { "cena": "Recusar o convite deles sai mais caro do que aceitar.", "eixo": "carisma", "dificuldade": 31 }
       ]
     },
@@ -156,7 +156,7 @@
       "lances": [
         { "cena": "Não tem tranca, não tem dobradiça, não tem por onde começar.", "eixo": "intelecto", "dificuldade": 33 },
         { "cena": "A porta pergunta o nome de quem bate.", "eixo": "carisma", "dificuldade": 32 },
-        { "cena": "Do outro lado, alguma coisa responde.", "eixo": "carisma", "dificuldade": 29 }
+        { "cena": "A porta cede um palmo, e não vai ceder de novo.", "eixo": "mobilidade", "dificuldade": 29 }
       ]
     },
     {
@@ -166,7 +166,7 @@
       "abertura": "A trilha existe em algum lugar debaixo de três dias de neve.",
       "lances": [
         { "cena": "Três dias de neve fecharam qualquer coisa parecida com trilha.", "eixo": "vigor", "dificuldade": 31 },
-        { "cena": "Precisa achar abrigo antes de escurecer, e escurece cedo.", "eixo": "intelecto", "dificuldade": 30 },
+        { "cena": "Precisa chegar ao abrigo antes de escurecer, e escurece cedo.", "eixo": "mobilidade", "dificuldade": 30 },
         { "cena": "O último trecho é subida, e a corda acabou antes.", "eixo": "mobilidade", "dificuldade": 30 }
       ]
     },
@@ -178,7 +178,7 @@
       "lances": [
         { "cena": "A água acaba antes da metade do caminho.", "eixo": "vigor", "dificuldade": 32 },
         { "cena": "A caravana some durante a noite, e leva o rumo junto.", "eixo": "intelecto", "dificuldade": 31 },
-        { "cena": "A areia se mexe, e dessa vez não é o vento.", "eixo": "combate", "dificuldade": 29 }
+        { "cena": "A areia se mexe, e dessa vez não é o vento. Quem parar, afunda.", "eixo": "mobilidade", "dificuldade": 29 }
       ]
     },
     {
@@ -210,7 +210,7 @@
       "tipo": "trono",
       "abertura": "Ele esperou sete eras sentado. Não vai levantar por qualquer um que entre.",
       "lances": [
-        { "cena": "Ele oferece o mundo para quem largar a espada agora.", "eixo": "carisma", "dificuldade": 34 },
+        { "cena": "Ele oferece o mundo para quem largar a espada agora, e a oferta tem fundo falso.", "eixo": "intelecto", "dificuldade": 34 },
         { "cena": "O salão inteiro é dele, inclusive o chão sob os pés de vocês.", "eixo": "mobilidade", "dificuldade": 35 },
         { "cena": "A coroa desce, e o primeiro golpe já é para matar.", "eixo": "combate", "dificuldade": 36 }
       ]
@@ -223,7 +223,7 @@
       "lances": [
         { "cena": "Ele diz o nome de cada um, na ordem em que pretende matá-los.", "eixo": "carisma", "dificuldade": 34 },
         { "cena": "Ele muda de forma no instante em que entende que pode perder.", "eixo": "combate", "dificuldade": 36 },
-        { "cena": "Sobrou um golpe, e sobrou uma pessoa para dá-lo.", "eixo": "combate", "dificuldade": 35 }
+        { "cena": "Sobrou um golpe, e quem for dá-lo precisa chegar de pé até ele.", "eixo": "vigor", "dificuldade": 35 }
       ]
     }
   ]

@@ -1,9 +1,10 @@
 /** Carregamento dos dados e montagem de parties sintéticas, usado pelos scripts. */
 import { readFileSync } from 'node:fs';
 import { exigenciaDaJornada, jornadaDoDia, sortearCandidatos } from '../src/motor.ts';
-import { EIXOS, TAMANHO_PARTY } from '../src/regras.ts';
+import { DEGRAU_DA_ETAPA, EIXOS, TAMANHO_PARTY } from '../src/regras.ts';
 import { escolher } from '../src/rng.ts';
 import type { BaseDeHerois, CatalogoDesafios, Desafio, Recrutado } from '../src/tipos.ts';
+import { faixaDeDificuldade, lancesEsperados } from './avaliar.ts';
 
 export const dbHerois: BaseDeHerois = JSON.parse(
   readFileSync(new URL('../public/data/guildas.json', import.meta.url), 'utf8'),
@@ -13,13 +14,38 @@ export const catalogo: CatalogoDesafios = JSON.parse(
   readFileSync(new URL('../public/data/desafios.json', import.meta.url), 'utf8'),
 );
 
+/** A faixa de dificuldade do catálogo, calculada uma vez e reusada a cada draft. */
+export const FAIXA = faixaDeDificuldade(catalogo, DEGRAU_DA_ETAPA);
+
 /**
- * `informado` é o jogador que sabe o que o dia cobra e monta contra isso — a
- * única habilidade que sobrou depois que todos os heróis passaram a somar os
- * mesmos 32 pontos. `guloso` e `aleatorio` viraram praticamente o mesmo
- * jogador, e é justamente por isso que servem de piso de comparação.
+ * Os jogadores sintéticos, e o que cada um serve para medir.
+ *
+ * - `pessimo` escolhe sempre o **pior** candidato pela mesma régua do
+ *   `sinergico`. É o controle do experimento: se o jogo é decisão de verdade,
+ *   existe uma distância clara entre ele e quem escolhe bem. Se não existe, o
+ *   draft é decoração — foi assim que a versão de atributos equilibrados foi
+ *   pega, e é a única medida que pega esse tipo de erro.
+ * - `aleatorio` escolhe entre os compatíveis sem critério. O jogador de primeira
+ *   vez.
+ * - `guloso` ordena por força bruta. Desde que todo herói soma os mesmos 32
+ *   pontos, é ruído puro — fica no conjunto para provar isso a cada rodagem.
+ * - `sinergico` joga a estratégia que o jogo diz pedir: sinergia, traços que
+ *   pagam, nenhum lado murcho no pentágono. **Não sabe o que o dia cobra.**
+ * - `informado` lê a exigência da jornada e monta contra ela.
+ *
+ * A pergunta que o par `pessimo` × `sinergico` responde é se a estratégia
+ * interna paga sem o oráculo do dia. Nenhuma medida anterior perguntava isso, e
+ * a resposta foi mais forte que a tese: o `sinergico` salva o mundo em 29,8% das
+ * jornadas contra 20,0% do `informado`. **Saber o que o dia cobra vale menos que
+ * montar a companhia direito** — o oráculo persegue o pentágono de um dia só e,
+ * ao fazer isso, aceita um lado murcho que o dia seguinte cobraria. Era o
+ * contrário do que eu esperava ao escrever este arquivo, e é o resultado que
+ * justifica a interface esconder a exigência da jornada: ela não estava
+ * escondendo a estratégia boa, estava escondendo uma armadilha.
  */
-export type Nivel = 'aleatorio' | 'guloso' | 'informado';
+export type Nivel = 'pessimo' | 'aleatorio' | 'guloso' | 'sinergico' | 'informado';
+
+export const NIVEIS: Nivel[] = ['pessimo', 'aleatorio', 'guloso', 'sinergico', 'informado'];
 
 export const forcaBruta = (h: Recrutado) => EIXOS.reduce((s, e) => s + h[e], 0);
 
@@ -52,6 +78,20 @@ export function montarParty(dia: string, nivel: Nivel, rnd: () => number): Monta
       escolha = escolher(rnd, legais);
     } else if (nivel === 'guloso') {
       escolha = legais.reduce((a, b) => (forcaBruta(b.heroi) > forcaBruta(a.heroi) ? b : a));
+    } else if (nivel === 'sinergico' || nivel === 'pessimo') {
+      // A mesma régua para os dois, lida em direções opostas: um busca o topo,
+      // o outro o fundo. Medir os dois com critérios diferentes não diria nada
+      // sobre o jogo — só sobre a diferença entre os critérios.
+      const valor = (c: (typeof legais)[number]) => lancesEsperados([...party, c.heroi], FAIXA);
+      escolha = legais.reduce((a, b) =>
+        nivel === 'sinergico'
+          ? valor(b) > valor(a)
+            ? b
+            : a
+          : valor(b) < valor(a)
+            ? b
+            : a,
+      );
     } else {
       // Mede o quanto a party ainda deve ao pentágono exigido pelo dia, e
       // escolhe quem mais reduz essa dívida.
