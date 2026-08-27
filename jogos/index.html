@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jogos — ExChaos</title>
+<meta name="description" content="Os jogos de navegador da ExChaos.">
+<link rel="icon" href="/assets/brand/exchaos-favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/brand/exchaos-favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/brand/exchaos-favicon-180.png">
+<link rel="stylesheet" href="/assets/brand/exchaos.css">
+<style>
+  .head{display:flex;align-items:center;gap:16px;margin-bottom:8px}
+  .head img{width:52px;height:52px;flex:none}
+  .head h1{font-family:var(--fd);font-weight:600;font-size:clamp(34px,7vw,52px);letter-spacing:.03em;margin:0}
+  .back{font-family:var(--fm);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-left:auto}
+  .back:hover{color:var(--arcane)}
+  .sub{font-family:var(--fb);font-style:italic;color:var(--parchment-dim);margin:0 0 36px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}
+  .card{
+    display:flex;flex-direction:column;
+    background:var(--ink);border:1px solid var(--line);border-radius:14px;
+    padding:20px;transition:.16s;color:inherit;min-height:160px;
+  }
+  .card:hover{border-color:var(--arcane);transform:translateY(-2px)}
+  .card h3{font-family:var(--fd);font-weight:600;font-size:23px;letter-spacing:.02em;color:var(--parchment);margin:0 0 8px}
+  .card p{font-family:var(--fb);font-size:14px;color:var(--parchment-dim);margin:0;line-height:1.5;flex:1}
+  .status{
+    font-family:var(--fm);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+    margin-top:16px;padding:5px 10px;border-radius:6px;align-self:flex-start;
+  }
+  .status--no-ar{color:#F3ECFF;background:var(--arcane-deep)}
+  .status--em-breve{color:var(--candle);border:1px solid var(--candle)}
+  .empty,.erro{font-family:var(--fb);color:var(--muted);font-style:italic;padding:40px 0}
+  .erro code{font-family:var(--fm);font-style:normal;color:var(--parchment-dim)}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="head">
+      <img src="/assets/brand/exchaos-mark.svg" alt="ExChaos">
+      <h1>Jogos</h1>
+      <a class="back" href="/">← Início</a>
+    </div>
+    <p class="sub">Do caos, mundos.</p>
+
+    <div id="grid" class="grid" aria-live="polite"></div>
+  </div>
+
+  <script>
+    const grid = document.getElementById('grid');
+
+    function card(j){
+      const el = document.createElement('a');
+      el.className = 'card';
+      el.href = `/jogos/${j.slug}/`;
+      const status = j.status === 'no-ar' ? 'no-ar' : 'em-breve';
+      const rotulo = status === 'no-ar' ? 'Jogar' : 'Em breve';
+      el.innerHTML = `
+        <h3></h3>
+        <p></p>
+        <span class="status status--${status}">${rotulo}</span>`;
+      el.querySelector('h3').textContent = j.titulo || j.slug;
+      el.querySelector('p').textContent = j.descricao || '';
+      return el;
+    }
+
+    fetch('/jogos/jogos.json')
+      .then(r => { if(!r.ok) throw new Error(r.status); return r.json(); })
+      .then(jogos => {
+        if(!Array.isArray(jogos) || jogos.length === 0){
+          grid.innerHTML = '<p class="empty">Os primeiros jogos estão tomando forma.</p>';
+          return;
+        }
+        jogos.forEach(j => grid.appendChild(card(j)));
+      })
+      .catch(err => {
+        grid.innerHTML = '<p class="erro">Não foi possível carregar o catálogo. ' +
+          'Se estiver testando local, rode um servidor (ex.: <code>npx serve</code>) — ' +
+          'abrir o arquivo direto bloqueia o carregamento do JSON.</p>';
+        console.error(err);
+      });
+  </script>
+</body>
+</html>

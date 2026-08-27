@@ -9,119 +9,44 @@
 <meta property="og:description" content="Jogos de navegador nascidos do caos. From chaos, worlds.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://exchaos.com.br">
-<link rel="icon" href="exchaos-favicon.svg" type="image/svg+xml">
-<link rel="icon" href="exchaos-favicon-32.png" sizes="32x32" type="image/png">
-<link rel="apple-touch-icon" href="exchaos-favicon-180.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@400;500;600;700&family=Spectral:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" href="/assets/brand/exchaos-favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/brand/exchaos-favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/brand/exchaos-favicon-180.png">
+<link rel="stylesheet" href="/assets/brand/exchaos.css">
 <style>
-  :root{
-    --obsidian:#14111C; --obsidian-deep:#0C0A12; --ink:#1E1A28;
-    --parchment:#E4D5B7; --parchment-dim:#B9A987;
-    --arcane:#9A6BE8; --arcane-deep:#6E49B0; --candle:#C9962E;
-    --muted:#8B7F97; --line:#332B42;
-    --fd:'Grenze Gotisch','Trajan Pro',serif;
-    --fb:'Spectral',Georgia,serif;
-    --fm:'IBM Plex Mono',ui-monospace,SFMono-Regular,monospace;
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0;height:100%}
-  body{
-    min-height:100%;
-    display:flex;flex-direction:column;
-    background:
-      radial-gradient(120% 75% at 50% -10%, rgba(154,107,232,.16), transparent 58%),
-      radial-gradient(90% 60% at 50% 112%, rgba(201,150,46,.07), transparent 60%),
-      var(--obsidian);
-    color:var(--parchment);
-    font-family:var(--fb);
-    -webkit-font-smoothing:antialiased;
-    text-align:center;
-  }
-
+  body{display:flex;flex-direction:column;text-align:center}
   main{
-    flex:1;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:6px;
-    padding:clamp(28px,6vw,64px) 22px;
-    animation:rise 1s ease both;
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:6px;padding:clamp(28px,6vw,64px) 22px;animation:rise 1s ease both;
   }
-
-  /* seal + glow */
   .seal-wrap{position:relative;display:grid;place-items:center;margin-bottom:14px}
   .glow{
     position:absolute;width:118%;height:118%;border-radius:50%;
     background:radial-gradient(circle, rgba(154,107,232,.34), rgba(154,107,232,0) 68%);
-    filter:blur(6px);
-    animation:breathe 5.5s ease-in-out infinite;
+    filter:blur(6px);animation:breathe 5.5s ease-in-out infinite;
   }
-  .seal{
-    position:relative;
-    width:clamp(128px,26vw,176px);height:auto;
-    filter:drop-shadow(0 0 14px rgba(154,107,232,.35));
-  }
-  .ring{fill:none;stroke:var(--arcane)}
+  .seal{position:relative;width:clamp(128px,26vw,176px);height:auto;filter:drop-shadow(0 0 14px rgba(154,107,232,.35))}
   .ring-spin{transform-origin:100px 100px;animation:spin 96s linear infinite}
-  .star{fill:none;stroke:var(--parchment);stroke-linecap:round}
-  .star-head,.gold{fill:var(--candle)}
-  .head{fill:var(--parchment)}
-
-  .wordmark{
-    font-family:var(--fd);font-weight:600;
-    font-size:clamp(52px,12vw,104px);line-height:.9;letter-spacing:.02em;
-    margin:0;color:var(--parchment);
-  }
+  .wordmark{font-family:var(--fd);font-weight:600;font-size:clamp(52px,12vw,104px);line-height:.9;letter-spacing:.02em;margin:0;color:var(--parchment)}
   .wordmark b{color:var(--arcane);font-weight:600}
-  .tagline{
-    font-family:var(--fb);font-style:italic;font-size:clamp(18px,3.2vw,26px);
-    color:var(--parchment-dim);margin:14px 0 0;letter-spacing:.01em;
-  }
-  .etym{font-family:var(--fm);font-size:12px;color:var(--muted);margin:12px 0 0;letter-spacing:.18em;text-transform:lowercase}
-
-  .rule{width:54px;height:1px;background:var(--line);margin:28px 0 24px}
-
-  .teaser{
-    font-family:var(--fb);font-size:clamp(15px,2.3vw,18px);
-    color:var(--parchment-dim);max-width:30ch;margin:0;line-height:1.6;
-  }
-  .badge{
-    font-family:var(--fm);font-size:11px;letter-spacing:.32em;text-transform:uppercase;
-    color:var(--candle);margin:22px 0 26px;
-    display:inline-flex;align-items:center;gap:10px;
-  }
+  .tagline{font-family:var(--fb);font-style:italic;font-size:clamp(18px,3.2vw,26px);color:var(--parchment-dim);margin:14px 0 0}
+  .etym{font-family:var(--fm);font-size:12px;color:var(--muted);margin:12px 0 0;letter-spacing:.18em}
+  .rule{margin:28px 0 24px}
+  .teaser{font-family:var(--fb);font-size:clamp(15px,2.3vw,18px);color:var(--parchment-dim);max-width:30ch;margin:0}
+  .badge{font-family:var(--fm);font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--candle);margin:22px 0 26px;display:inline-flex;align-items:center;gap:10px}
   .badge::before,.badge::after{content:"";width:20px;height:1px;background:var(--candle);opacity:.5}
-
   .actions{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
-  .btn{
-    font-family:var(--fm);font-size:13px;letter-spacing:.14em;text-transform:uppercase;
-    text-decoration:none;border-radius:9px;padding:13px 22px;transition:.16s;
-    display:inline-block;
-  }
-  .btn--primary{background:var(--arcane-deep);color:#F3ECFF;border:1px solid transparent}
-  .btn--primary:hover{background:var(--arcane)}
-  .btn--ghost{color:var(--parchment);border:1px solid var(--line)}
-  .btn--ghost:hover{border-color:var(--arcane);color:#F3ECFF}
-
-  footer{
-    padding:26px 22px;border-top:1px solid var(--line);
-    font-family:var(--fm);font-size:12px;color:var(--muted);letter-spacing:.06em;
-    display:flex;gap:8px 20px;justify-content:center;flex-wrap:wrap;align-items:center;
-  }
-  footer a{color:var(--parchment-dim);text-decoration:none}
+  footer{padding:26px 22px;border-top:1px solid var(--line);font-family:var(--fm);font-size:12px;color:var(--muted);letter-spacing:.06em;display:flex;gap:8px 20px;justify-content:center;flex-wrap:wrap;align-items:center}
+  footer a{color:var(--parchment-dim)}
   footer a:hover{color:var(--arcane)}
   footer .sep{opacity:.4}
-
   @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
   @keyframes breathe{0%,100%{opacity:.7;transform:scale(.96)}50%{opacity:1;transform:scale(1.04)}}
   @keyframes spin{to{transform:rotate(360deg)}}
-  @media (prefers-reduced-motion:reduce){
-    main{animation:none}.glow{animation:none}.ring-spin{animation:none}
-  }
+  @media (prefers-reduced-motion:reduce){main{animation:none}.glow{animation:none}.ring-spin{animation:none}}
 </style>
 </head>
 <body>
-
   <main>
     <div class="seal-wrap">
       <div class="glow"></div>
@@ -150,21 +75,16 @@
         <path class="gold" d="M100,92 L101.8,98.2 L108,100 L101.8,101.8 L100,108 L98.2,101.8 L92,100 L98.2,98.2 Z"/>
       </svg>
     </div>
-
     <h1 class="wordmark">Ex<b>Chaos</b></h1>
     <p class="tagline">From chaos, worlds.</p>
     <p class="etym">ex chaos · a partir do caos</p>
-
-    <div class="rule"></div>
-
+    <hr class="rule">
     <div class="badge">Em breve</div>
-
     <div class="actions">
-      <a class="btn btn--primary" href="mailto:contato@exchaos.com.br">Fale com a gente</a>
+      <a class="btn btn--primary" href="/jogos/">Ver os jogos</a>
       <a class="btn btn--ghost" href="https://instagram.com/PlayExChaos" target="_blank" rel="noopener">Instagram</a>
     </div>
   </main>
-
   <footer>
     <span>© 2026 ExChaos</span>
     <span class="sep">·</span>
@@ -172,6 +92,5 @@
     <span class="sep">·</span>
     <a href="https://instagram.com/PlayExChaos" target="_blank" rel="noopener">@PlayExChaos</a>
   </footer>
-
 </body>
 </html>

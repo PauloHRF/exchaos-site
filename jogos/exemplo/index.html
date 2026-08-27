@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exemplo — ExChaos</title>
+<link rel="icon" href="/assets/brand/exchaos-favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/brand/exchaos-favicon-180.png">
+<link rel="stylesheet" href="/assets/brand/exchaos.css">
+<style>
+  body{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:32px 22px;gap:6px}
+  img.mark{width:84px;height:84px;margin-bottom:10px;filter:drop-shadow(0 0 14px rgba(154,107,232,.3))}
+  h1{font-family:var(--fd);font-weight:600;font-size:clamp(36px,8vw,58px);letter-spacing:.03em;margin:0}
+  .lead{font-family:var(--fb);font-style:italic;color:var(--parchment-dim);margin:8px 0 0}
+  .note{font-family:var(--fb);color:var(--muted);max-width:34ch;margin:18px 0 28px;line-height:1.6}
+  .roll{font-family:var(--fd);font-weight:600;font-size:64px;color:var(--candle);min-height:72px;line-height:1;margin:8px 0 20px}
+  .back{font-family:var(--fm);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+  .back:hover{color:var(--arcane)}
+</style>
+</head>
+<body>
+  <img class="mark" src="/assets/brand/exchaos-mark.svg" alt="ExChaos">
+  <h1>Exemplo</h1>
+  <p class="lead">Aqui vai o seu jogo.</p>
+  <p class="note">Esta pasta é o molde de um jogo: auto-contida, caminhos relativos internos, marca vinda de <code>/assets/brand/</code>. Duplique-a, renomeie e construa dentro.</p>
+
+  <div class="roll" id="roll">—</div>
+  <button class="btn btn--primary" id="btn">Rolar d20</button>
+
+  <a class="back" href="/jogos/">← Voltar aos jogos</a>
+
+  <script>
+    // Stub só pra provar que o shell está vivo e pronto pra receber JS de jogo.
+    document.getElementById('btn').addEventListener('click', () => {
+      document.getElementById('roll').textContent = 1 + Math.floor(Math.random() * 20);
+    });
+  </script>
+</body>
+</html>
