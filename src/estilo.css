@@ -1,31 +1,54 @@
 /*
- * Linguagem visual: página de livro de mesa impressa em papel escuro — tinta
- * quase preta, ouro gasto, selo de lacre vermelho. Nada de fonte externa nem
- * imagem: tudo sai de gradiente e de SVG embutido, para o primeiro
- * carregamento continuar em milissegundos.
+ * Linguagem visual: a identidade ExChaos (guia v1) aplicada a um livro de mesa
+ * — obsidiana, pergaminho, o arcano nos botões e o calor de vela na ênfase.
+ *
+ * A arte continua saindo de gradiente e de SVG embutido, sem imagem nenhuma. As
+ * fontes agora são as três da marca, do Google Fonts: é a única dependência
+ * externa da página, e carrega com `display=swap` justamente para o texto
+ * aparecer na fonte de sistema antes, em vez de segurar a tela em branco.
  *
  * O jogo é de leitura, então o layout é horizontal: painel de contexto de um
  * lado, o que muda a cada clique do outro.
  */
 
 :root {
-  --tinta: #100d09;
-  --tinta-2: #191410;
-  --tinta-3: #221b15;
-  --couro: #2e2419;
-  --bronze: #6d5636;
-  --ouro: #c9a227;
-  --ouro-claro: #e8ca77;
-  --pergaminho: #ece3d0;
-  --pergaminho-fraco: #a2937a;
-  --sangue: #b04a41;
-  --musgo: #7fa06a;
-  --ambar: #d9a441;
-  --violeta: #a583c4;
+  /*
+   * Paleta ExChaos (guia v1). As sete cores da marca vêm primeiro, com o nome
+   * que o guia usa — é por elas que se confere se o site saiu da identidade.
+   */
+  --obsidiana: #14111c;
+  --marca-tinta: #1e1a28;
+  --marca-pergaminho: #e4d5b7;
+  --arcano: #9a6be8;
+  --vela: #c9962e;
+  --marca-sangue: #8a2b2b;
+  --nevoa: #8b7f97;
+
+  /*
+   * Os tokens do jogo, agora servidos pela paleta acima. Os nomes ficaram: são
+   * mil e trezentas linhas de CSS chamando --ouro e --couro, e trocar o valor
+   * num lugar só é o que torna a identidade uma decisão reversível, em vez de
+   * uma varredura pelo arquivo inteiro.
+   *
+   * O que está marcado como derivado é tom da mesma cor — clareado para servir
+   * de texto, escurecido para servir de borda. O matiz continua sendo o da marca.
+   */
+  --tinta: var(--obsidiana);
+  --tinta-2: var(--marca-tinta);
+  --tinta-3: #262032; /* derivado: superfície um degrau acima da Tinta */
+  --couro: #2c2539; /* derivado: borda discreta */
+  --bronze: #4a3f63; /* derivado: borda visível, puxada para o Arcano */
+  --ouro: var(--vela);
+  --ouro-claro: #e3b75c; /* derivado: Vela clareada, para texto e brilho */
+  --pergaminho: var(--marca-pergaminho);
+  --pergaminho-fraco: var(--nevoa);
+  --sangue: var(--marca-sangue);
+  --arcano-claro: #b79ae0; /* derivado: Arcano clareado */
+  --ambar: #d4a63f; /* derivado: Vela quente, para a vitória que custou */
 
   /* Tons claros o bastante para servirem de texto sobre o fundo escuro. */
-  --bronze-claro: #a9855a;
-  --sangue-claro: #d9776c;
+  --bronze-claro: var(--nevoa);
+  --sangue-claro: #cf6058; /* derivado: Sangue clareado até 4,85:1 sobre Obsidiana */
 
   --sombra: 0 3px 18px rgba(0, 0, 0, 0.6);
 
@@ -53,9 +76,20 @@
   --raio: 4px;
   --raio-g: 6px;
 
-  --fonte-livro: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia,
-    'Times New Roman', serif;
-  --fonte-numero: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
+  /*
+   * As três fontes da ExChaos. Grenze Gotisch é gótica de display: ótima numa
+   * linha de título, cansativa num parágrafo — por isso Spectral carrega o
+   * corpo, que é onde este jogo de fato acontece.
+   *
+   * Cada uma mantém a pilha de sistema atrás como reserva: com `display=swap`,
+   * é ela que aparece enquanto a fonte da marca carrega, e é ela que fica se o
+   * Google Fonts não responder.
+   */
+  --fonte-titulo: 'Grenze Gotisch', 'Iowan Old Style', Palatino, Georgia, serif;
+  --fonte-livro: 'Spectral', 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua',
+    Georgia, 'Times New Roman', serif;
+  --fonte-numero: 'IBM Plex Mono', ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas,
+    monospace;
 
   color-scheme: dark;
 }
@@ -69,8 +103,8 @@
 body {
   background-color: var(--tinta);
   background-image:
-    radial-gradient(ellipse 120% 80% at 50% -10%, rgba(201, 162, 39, 0.09), transparent 60%),
-    radial-gradient(ellipse 100% 100% at 50% 120%, rgba(120, 60, 30, 0.07), transparent 60%);
+    radial-gradient(ellipse 120% 80% at 50% -10%, rgba(154, 107, 232, 0.1), transparent 60%),
+    radial-gradient(ellipse 100% 100% at 50% 120%, rgba(201, 150, 46, 0.07), transparent 60%);
   background-attachment: fixed;
   color: var(--pergaminho);
   font-family: var(--fonte-livro);
@@ -123,11 +157,11 @@ ol {
   font-weight: 700;
   letter-spacing: 0.02em;
   line-height: 1;
-  background: linear-gradient(175deg, var(--ouro-claro) 10%, var(--ouro) 55%, #9c7b1e 100%);
+  background: linear-gradient(175deg, var(--ouro-claro) 10%, var(--ouro) 55%, #8a6420 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  text-shadow: 0 2px 14px rgba(201, 162, 39, 0.18);
+  text-shadow: 0 2px 14px rgba(201, 150, 46, 0.18);
 }
 
 .marca {
@@ -185,10 +219,10 @@ ol {
   justify-content: space-between;
   gap: var(--e3);
   padding: var(--e3) var(--e4);
-  background: linear-gradient(180deg, rgba(46, 36, 25, 0.55), rgba(25, 20, 16, 0.75));
+  background: linear-gradient(180deg, rgba(44, 37, 57, 0.55), rgba(30, 26, 40, 0.75));
   border: 1px solid var(--couro);
   border-radius: var(--raio);
-  box-shadow: inset 0 0 0 1px rgba(201, 162, 39, 0.07);
+  box-shadow: inset 0 0 0 1px rgba(201, 150, 46, 0.07);
 }
 
 .jornada-corpo {
@@ -202,14 +236,14 @@ ol {
 
 .bloco {
   position: relative;
-  background: linear-gradient(180deg, rgba(46, 36, 25, 0.5), rgba(25, 20, 16, 0.72));
+  background: linear-gradient(180deg, rgba(44, 37, 57, 0.5), rgba(30, 26, 40, 0.72));
   border: 1px solid var(--couro);
   border-radius: var(--raio);
   padding: var(--e4);
   margin-bottom: var(--e4);
   box-shadow:
     var(--sombra),
-    inset 0 0 0 1px rgba(201, 162, 39, 0.07);
+    inset 0 0 0 1px rgba(201, 150, 46, 0.07);
 }
 
 /*
@@ -223,7 +257,7 @@ ol {
   position: absolute;
   width: 11px;
   height: 11px;
-  border: 1px solid rgba(201, 162, 39, 0.42);
+  border: 1px solid rgba(201, 150, 46, 0.42);
   pointer-events: none;
 }
 
@@ -257,7 +291,7 @@ ol {
   display: block;
   height: 1px;
   margin-top: var(--e2);
-  background: linear-gradient(90deg, var(--bronze), rgba(109, 86, 54, 0.15) 60%, transparent);
+  background: linear-gradient(90deg, var(--bronze), rgba(74, 63, 99, 0.15) 60%, transparent);
 }
 
 /* Bloco de prosa da tela de abertura. */
@@ -272,7 +306,7 @@ ol {
 .pergaminho .remate {
   margin-top: var(--e4);
   padding-top: var(--e3);
-  border-top: 1px solid rgba(109, 86, 54, 0.45);
+  border-top: 1px solid rgba(74, 63, 99, 0.45);
   color: var(--ouro-claro);
 }
 
@@ -311,8 +345,8 @@ ol {
 }
 
 .ajuda-pagina .aviso {
-  border: 1px solid rgba(176, 74, 65, 0.45);
-  background: rgba(176, 74, 65, 0.09);
+  border: 1px solid rgba(138, 43, 43, 0.45);
+  background: rgba(138, 43, 43, 0.09);
   border-radius: var(--raio);
   padding: var(--e3);
 }
@@ -322,7 +356,7 @@ ol {
   font-size: var(--t-sm);
   text-align: center;
   color: var(--ouro-claro);
-  background: rgba(16, 13, 9, 0.5);
+  background: rgba(20, 17, 28, 0.5);
   border: 1px solid var(--couro);
   border-radius: var(--raio);
   padding: var(--e3);
@@ -338,7 +372,7 @@ ol {
   color: var(--ouro-claro);
 }
 .ajuda-pagina .marca.sucesso {
-  color: var(--musgo);
+  color: var(--arcano);
 }
 .ajuda-pagina .marca.custoso {
   color: var(--ambar);
@@ -385,7 +419,7 @@ ol {
   width: 100%;
   aspect-ratio: 4 / 3;
   border-bottom: 1px solid var(--couro);
-  box-shadow: inset 0 -34px 44px -22px rgba(16, 13, 9, 0.95);
+  box-shadow: inset 0 -34px 44px -22px rgba(20, 17, 28, 0.95);
 }
 
 .retrato.pequeno {
@@ -433,7 +467,7 @@ ol {
     transform 0.14s ease,
     border-color 0.14s ease,
     box-shadow 0.14s ease;
-  box-shadow: inset 0 1px 0 rgba(236, 227, 208, 0.05);
+  box-shadow: inset 0 1px 0 rgba(228, 213, 183, 0.05);
 }
 
 .carta:hover:not(:disabled) {
@@ -441,7 +475,7 @@ ol {
   transform: translateY(-3px);
   box-shadow:
     0 8px 22px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(201, 162, 39, 0.25);
+    0 0 0 1px rgba(201, 150, 46, 0.25);
 }
 
 .carta.recusado {
@@ -501,7 +535,7 @@ ol {
 }
 
 .moral.trevas {
-  color: var(--violeta);
+  color: var(--arcano-claro);
 }
 
 /* O traço do herói: o que ele muda no jogo, e a razão de escolhê-lo. */
@@ -509,7 +543,7 @@ ol {
   display: block;
   margin-top: var(--e2);
   padding-top: var(--e2);
-  border-top: 1px solid rgba(201, 162, 39, 0.2);
+  border-top: 1px solid rgba(201, 150, 46, 0.2);
 }
 
 .traco-heroi b {
@@ -540,24 +574,24 @@ ol {
 .traco {
   font-size: var(--t-xs);
   font-style: italic;
-  background: rgba(201, 162, 39, 0.1);
-  border: 1px solid rgba(201, 162, 39, 0.28);
+  background: rgba(201, 150, 46, 0.1);
+  border: 1px solid rgba(201, 150, 46, 0.28);
   color: var(--ouro-claro);
   border-radius: 2px;
   padding: 0 var(--e2);
 }
 
 .traco.veto {
-  background: rgba(176, 74, 65, 0.1);
-  border-color: rgba(176, 74, 65, 0.34);
-  color: var(--sangue);
+  background: rgba(138, 43, 43, 0.1);
+  border-color: rgba(138, 43, 43, 0.34);
+  color: var(--sangue-claro);
 }
 
 .motivo-recusa {
   display: block;
   margin-top: var(--e2);
   padding-top: var(--e2);
-  border-top: 1px solid rgba(176, 74, 65, 0.3);
+  border-top: 1px solid rgba(138, 43, 43, 0.3);
   color: var(--sangue-claro);
   font-size: var(--t-sm);
   font-style: italic;
@@ -573,21 +607,21 @@ ol {
 
 .radar-anel {
   fill: none;
-  stroke: rgba(109, 86, 54, 0.55);
+  stroke: rgba(74, 63, 99, 0.55);
   stroke-width: 1;
 }
 
 .radar-raio {
-  stroke: rgba(109, 86, 54, 0.4);
+  stroke: rgba(74, 63, 99, 0.4);
   stroke-width: 1;
 }
 
 .radar-valor {
-  fill: rgba(201, 162, 39, 0.26);
+  fill: rgba(201, 150, 46, 0.26);
   stroke: var(--ouro-claro);
   stroke-width: 1.7;
   stroke-linejoin: round;
-  filter: drop-shadow(0 0 4px rgba(201, 162, 39, 0.35));
+  filter: drop-shadow(0 0 4px rgba(201, 150, 46, 0.35));
 }
 
 .radar-rotulo {
@@ -639,7 +673,7 @@ ol {
   gap: var(--e2);
   align-items: baseline;
   padding: var(--e1) 0;
-  border-bottom: 1px dotted rgba(109, 86, 54, 0.5);
+  border-bottom: 1px dotted rgba(74, 63, 99, 0.5);
 }
 
 .linha-eixo .rotulo {
@@ -668,7 +702,7 @@ ol {
   align-items: center;
   text-align: center;
   gap: var(--e1);
-  background: rgba(16, 13, 9, 0.5);
+  background: rgba(20, 17, 28, 0.5);
   border: 1px solid var(--couro);
   border-top: 2px solid var(--bronze);
   border-radius: var(--raio);
@@ -678,7 +712,7 @@ ol {
 }
 
 .membro.vazio {
-  border: 1px dashed rgba(109, 86, 54, 0.55);
+  border: 1px dashed rgba(74, 63, 99, 0.55);
   background: none;
   color: var(--pergaminho-fraco);
   justify-content: center;
@@ -692,7 +726,7 @@ ol {
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  border: 1px dashed rgba(109, 86, 54, 0.55);
+  border: 1px dashed rgba(74, 63, 99, 0.55);
   font-size: var(--t-lg);
   font-style: normal;
 }
@@ -716,10 +750,10 @@ ol {
   display: block;
   width: 100%;
   padding: var(--e3) var(--e4);
-  border: 1px solid #8a6d1c;
+  border: 1px solid #6f47b8;
   border-radius: var(--raio);
-  background: linear-gradient(180deg, var(--ouro-claro) 0%, var(--ouro) 52%, #a8871d 100%);
-  color: #241a05;
+  background: linear-gradient(180deg, var(--arcano-claro) 0%, var(--arcano) 52%, #7a52c4 100%);
+  color: var(--obsidiana);
   font-family: var(--fonte-livro);
   font-weight: 700;
   font-size: var(--t-base);
@@ -727,7 +761,7 @@ ol {
   text-transform: uppercase;
   cursor: pointer;
   box-shadow:
-    inset 0 1px 0 rgba(255, 246, 214, 0.55),
+    inset 0 1px 0 rgba(244, 234, 212, 0.5),
     inset 0 -1px 0 rgba(0, 0, 0, 0.22),
     0 3px 12px rgba(0, 0, 0, 0.45);
   transition: filter 0.15s ease, transform 0.1s ease;
@@ -742,7 +776,7 @@ ol {
 }
 
 .botao.secundario {
-  background: rgba(46, 36, 25, 0.35);
+  background: rgba(44, 37, 57, 0.35);
   border: 1px solid var(--couro);
   color: var(--pergaminho-fraco);
   font-weight: 400;
@@ -782,7 +816,7 @@ ol {
 .escolha:hover {
   border-color: var(--ouro);
   border-left-color: var(--ouro);
-  box-shadow: 0 0 0 1px rgba(201, 162, 39, 0.2);
+  box-shadow: 0 0 0 1px rgba(201, 150, 46, 0.2);
 }
 
 .escolha strong {
@@ -801,7 +835,7 @@ ol {
 
 .cena {
   position: relative;
-  background: linear-gradient(180deg, rgba(46, 36, 25, 0.5), rgba(25, 20, 16, 0.72));
+  background: linear-gradient(180deg, rgba(44, 37, 57, 0.5), rgba(30, 26, 40, 0.72));
   border: 1px solid var(--couro);
   border-radius: var(--raio);
   overflow: hidden;
@@ -814,7 +848,7 @@ ol {
   background-size: cover;
   background-position: center;
   border-bottom: 1px solid var(--couro);
-  box-shadow: inset 0 -50px 60px -30px rgba(16, 13, 9, 0.95);
+  box-shadow: inset 0 -50px 60px -30px rgba(20, 17, 28, 0.95);
 }
 
 .cena-tipo {
@@ -825,8 +859,8 @@ ol {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--ouro-claro);
-  background: rgba(16, 13, 9, 0.7);
-  border: 1px solid rgba(201, 162, 39, 0.3);
+  background: rgba(20, 17, 28, 0.7);
+  border: 1px solid rgba(201, 150, 46, 0.3);
   border-radius: 2px;
   padding: 0 var(--e2);
 }
@@ -851,7 +885,7 @@ ol {
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: var(--e2) var(--e1);
   padding: var(--e3) var(--e3) var(--e4);
-  border-top: 1px solid rgba(109, 86, 54, 0.4);
+  border-top: 1px solid rgba(74, 63, 99, 0.4);
 }
 
 .party-estado li {
@@ -895,18 +929,18 @@ ol {
 
 .party-estado li.caido .nome {
   text-decoration: line-through;
-  text-decoration-color: rgba(176, 74, 65, 0.7);
+  text-decoration-color: rgba(138, 43, 43, 0.7);
 }
 
 .party-estado .cruz {
-  color: var(--sangue);
+  color: var(--sangue-claro);
 }
 
 /* ---------- jornada: painel dos lances ---------- */
 
 .painel {
   position: relative;
-  background: linear-gradient(180deg, rgba(46, 36, 25, 0.4), rgba(25, 20, 16, 0.68));
+  background: linear-gradient(180deg, rgba(44, 37, 57, 0.4), rgba(30, 26, 40, 0.68));
   border: 1px solid var(--couro);
   border-radius: var(--raio);
   padding: var(--e3);
@@ -941,7 +975,7 @@ ol {
 
 .aba {
   flex: 1;
-  background: rgba(16, 13, 9, 0.5);
+  background: rgba(20, 17, 28, 0.5);
   border: 1px solid var(--couro);
   border-radius: var(--raio);
   padding: var(--e2) 0 var(--e1);
@@ -958,8 +992,8 @@ ol {
 
 .aba.aberta {
   border-color: var(--ouro);
-  background: rgba(201, 162, 39, 0.12);
-  box-shadow: inset 0 0 12px rgba(201, 162, 39, 0.12);
+  background: rgba(201, 150, 46, 0.12);
+  box-shadow: inset 0 0 12px rgba(201, 150, 46, 0.12);
 }
 
 .aba.trancada {
@@ -1008,8 +1042,8 @@ ol {
  * corpo grande; a cena que armou o lance e a conta ficam discretas em volta.
  */
 .lance {
-  --cor: var(--bronze);
-  --tom: rgba(109, 86, 54, 0.1);
+  --cor: var(--nevoa);
+  --tom: rgba(139, 127, 151, 0.08);
   border: 1px solid var(--cor);
   border-left: 4px solid var(--cor);
   border-radius: var(--raio-g);
@@ -1104,22 +1138,22 @@ ol {
 
 .lance.brilhante {
   --cor: var(--ouro);
-  --tom: rgba(201, 162, 39, 0.1);
+  --tom: rgba(201, 150, 46, 0.1);
 }
 
 .lance.brilhante .marca {
   color: var(--ouro-claro);
-  text-shadow: 0 0 8px rgba(201, 162, 39, 0.6);
+  text-shadow: 0 0 8px rgba(201, 150, 46, 0.6);
 }
 
 .lance.sucesso {
-  --cor: var(--musgo);
-  --tom: rgba(127, 160, 106, 0.1);
+  --cor: var(--arcano);
+  --tom: rgba(154, 107, 232, 0.12);
 }
 
 .lance.custoso {
   --cor: var(--ambar);
-  --tom: rgba(217, 164, 65, 0.11);
+  --tom: rgba(212, 166, 63, 0.11);
 }
 
 .lance.custoso .lance-desfecho {
@@ -1127,13 +1161,13 @@ ol {
 }
 
 .lance.falha {
-  --cor: var(--bronze);
-  --tom: rgba(16, 13, 9, 0.4);
+  --cor: var(--nevoa);
+  --tom: rgba(20, 17, 28, 0.4);
 }
 
 .lance.grave {
-  --cor: var(--sangue);
-  --tom: rgba(176, 74, 65, 0.12);
+  --cor: var(--sangue-claro);
+  --tom: rgba(138, 43, 43, 0.12);
 }
 
 .lance.grave .lance-desfecho {
@@ -1145,7 +1179,7 @@ ol {
   font-style: italic;
   text-align: center;
   padding: var(--e5) var(--e2);
-  border: 1px dashed rgba(109, 86, 54, 0.5);
+  border: 1px dashed rgba(74, 63, 99, 0.5);
   border-radius: var(--raio);
 }
 
@@ -1158,13 +1192,13 @@ ol {
   text-align: center;
   padding: var(--e2);
   margin-top: var(--e1);
-  border-top: 1px solid rgba(109, 86, 54, 0.45);
+  border-top: 1px solid rgba(74, 63, 99, 0.45);
   animation: surgir 0.45s ease both;
   animation-delay: calc(var(--ordem, 0) * var(--compasso));
 }
 
 .etapa-fecho.vitoria-limpa {
-  color: var(--musgo);
+  color: var(--arcano);
 }
 
 .etapa-fecho.vitoria-custosa {
@@ -1176,7 +1210,7 @@ ol {
 }
 
 .painel-acao {
-  border-top: 1px solid rgba(109, 86, 54, 0.45);
+  border-top: 1px solid rgba(74, 63, 99, 0.45);
   padding-top: var(--e3);
 }
 
@@ -1189,13 +1223,13 @@ ol {
   border: 1px solid var(--couro);
   border-radius: var(--raio);
   background:
-    radial-gradient(ellipse 80% 70% at 50% 0%, rgba(201, 162, 39, 0.1), transparent 70%),
-    rgba(16, 13, 9, 0.45);
+    radial-gradient(ellipse 80% 70% at 50% 0%, rgba(201, 150, 46, 0.1), transparent 70%),
+    rgba(20, 17, 28, 0.45);
 }
 
 /* A jornada perfeita se anuncia pela grade, não por um número. */
 .placar.perfeito .grade {
-  filter: drop-shadow(0 0 14px rgba(127, 160, 106, 0.45));
+  filter: drop-shadow(0 0 14px rgba(154, 107, 232, 0.5));
 }
 
 .aba.desfecho .aba-num {
@@ -1207,7 +1241,7 @@ ol {
 .epilogo {
   margin-top: var(--e3);
   padding: var(--e4) var(--e1) 0;
-  border-top: 1px solid rgba(109, 86, 54, 0.45);
+  border-top: 1px solid rgba(74, 63, 99, 0.45);
   text-align: center;
 }
 
@@ -1227,7 +1261,7 @@ ol {
 .epilogo-selo {
   margin-top: var(--e3);
   padding-top: var(--e3);
-  border-top: 1px dotted rgba(109, 86, 54, 0.45);
+  border-top: 1px dotted rgba(74, 63, 99, 0.45);
   color: var(--pergaminho-fraco);
   font-style: italic;
   font-size: var(--t-base);
@@ -1263,7 +1297,7 @@ ol {
   border-radius: var(--raio-g);
   box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.6),
-    0 0 0 1px rgba(201, 162, 39, 0.2);
+    0 0 0 1px rgba(201, 150, 46, 0.2);
 }
 
 .cartao-acoes {
@@ -1274,7 +1308,7 @@ ol {
   width: 100%;
   margin-top: var(--e2);
   padding: var(--e3);
-  background: rgba(16, 13, 9, 0.7);
+  background: rgba(20, 17, 28, 0.7);
   color: var(--pergaminho);
   border: 1px solid var(--couro);
   border-radius: var(--raio);
@@ -1365,5 +1399,102 @@ ol {
   }
   .carta:hover:not(:disabled) {
     transform: none;
+  }
+}
+
+/* ---------- identidade tipográfica ExChaos ---------- */
+
+/*
+ * Grenze Gotisch entra só no que é display. `.marca` fica escopado ao topo de
+ * propósito: a mesma classe nomeia os marcadores de desfecho de um lance
+ * (★ ● ◍ ○ ✝), e trocar a fonte deles mudaria os símbolos.
+ */
+.topo .marca,
+h2,
+h3,
+.cena-titulo,
+.painel-titulo,
+.epilogo h3 {
+  font-family: var(--fonte-titulo);
+}
+
+/*
+ * A gótica tem mancha mais escura e altura-x menor que a serifada: no mesmo
+ * corpo ela parece menor e mais apertada. Uma pitada de espaço entre letras e
+ * um degrau a mais de tamanho devolvem o peso que o título tinha.
+ */
+.topo .marca {
+  letter-spacing: 0.03em;
+}
+
+h2,
+h3,
+.cena-titulo,
+.epilogo h3 {
+  letter-spacing: 0.015em;
+  line-height: 1.25;
+}
+
+/* ---------- o selo da ExChaos ---------- */
+
+/*
+ * A assinatura do portal acima do nome do jogo. Fica discreta de propósito: a
+ * página é do jogo, e a marca está ali para dizer de onde ele vem — não para
+ * disputar a atenção com "Até o Trono".
+ */
+.portal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--e3);
+  /*
+   * Área de respiro do guia: pelo menos metade da altura do selo livre em
+   * volta. O selo tem 38px, então 20px em cima e embaixo cumprem com folga.
+   */
+  padding: 20px 0;
+}
+
+.portal-selo {
+  display: block;
+  flex: none;
+  width: 38px;
+  height: 38px;
+}
+
+.selo-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.portal-texto {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  text-align: left;
+}
+
+/* O wordmark é Pergaminho, como o guia manda — o dourado é do nome do jogo. */
+.portal-texto b {
+  font-family: var(--fonte-titulo);
+  font-weight: 400;
+  font-size: var(--t-lg);
+  color: var(--pergaminho);
+  letter-spacing: 0.04em;
+}
+
+.portal-texto i {
+  font-family: var(--fonte-numero);
+  font-style: normal;
+  font-size: var(--t-xs);
+  color: var(--nevoa);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Numa tela estreita a tagline é a primeira coisa que pode sair sem perda. */
+@media (max-width: 420px) {
+  .portal-texto i {
+    display: none;
   }
 }

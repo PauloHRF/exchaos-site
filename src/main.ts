@@ -41,6 +41,40 @@ import type {
   Tatica,
 } from './tipos.ts';
 
+/**
+ * O selo da ExChaos: a Estrela do Caos com o núcleo dourado de ordem.
+ *
+ * Vai embutido em vez de vir de `public/` porque é o que o resto da arte já
+ * faz — brasões e cenários também são SVG gerado aqui — e porque um pedido de
+ * rede a mais para 1 KB de marca não se paga. A versão colorida é a correta:
+ * o guia manda usá-la sobre superfície escura, que é o fundo obsidiana daqui.
+ */
+const SELO_EXCHAOS = `
+<svg class="selo-svg" viewBox="0 0 200 200" role="img" aria-label="ExChaos">
+  <defs>
+    <g id="flecha-exchaos">
+      <path d="M100,84 L100,42" fill="none" stroke="#E4D5B7" stroke-width="7" stroke-linecap="round"/>
+      <path d="M100,33 L109,48 L91,48 Z" fill="#E4D5B7"/>
+    </g>
+  </defs>
+  <circle cx="100" cy="100" r="94" fill="none" stroke="#9A6BE8" stroke-width="1.4"/>
+  <circle cx="100" cy="100" r="91" fill="none" stroke="#9A6BE8" stroke-width="2.2" stroke-dasharray="2 10"/>
+  <circle cx="100" cy="100" r="87" fill="none" stroke="#9A6BE8" stroke-width="0.7"/>
+  <g fill="#C9962E">
+    <circle cx="150" cy="70" r="1.3"/><circle cx="52" cy="126" r="1.1"/>
+    <circle cx="126" cy="150" r="1.2"/><circle cx="70" cy="52" r="1"/>
+  </g>
+  <use href="#flecha-exchaos" transform="rotate(0 100 100)"/>
+  <use href="#flecha-exchaos" transform="rotate(45 100 100)"/>
+  <use href="#flecha-exchaos" transform="rotate(90 100 100)"/>
+  <use href="#flecha-exchaos" transform="rotate(135 100 100)"/>
+  <use href="#flecha-exchaos" transform="rotate(180 100 100)"/>
+  <use href="#flecha-exchaos" transform="rotate(225 100 100)"/>
+  <use href="#flecha-exchaos" transform="rotate(270 100 100)"/>
+  <use href="#flecha-exchaos" transform="rotate(315 100 100)"/>
+  <path d="M100,92 L101.8,98.2 L108,100 L101.8,101.8 L100,108 L98.2,101.8 L92,100 L98.2,98.2 Z" fill="#C9962E"/>
+</svg>`;
+
 const ROTULO_MORAL: Record<number, string> = {
   [-3]: 'Vilão',
   [-2]: 'Cruel',
@@ -679,6 +713,13 @@ function telaJornada(): string {
 
 function desenhar() {
   const cabecalho = `
+    <div class="portal">
+      <span class="portal-selo">${SELO_EXCHAOS}</span>
+      <span class="portal-texto">
+        <b>ExChaos</b>
+        <i>From chaos, worlds.</i>
+      </span>
+    </div>
     <header class="topo">
       <div class="marca">Até o Trono</div>
       <div class="subtitulo">${
