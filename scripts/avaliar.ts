@@ -132,6 +132,13 @@ export function lancesPorEixoNoDia(catalogo: CatalogoDesafios): Record<Eixo, num
  * resultado exato custa menos que a desconfiança de um valor aproximado.
  */
 export function chanceDePassar(soma: number, modificadores: number, faixa: Faixa): number {
+  const x = soma + modificadores;
+  const piso = Math.floor(x);
+  const frac = x - piso;
+  if (frac > 0) {
+    const a = chanceDePassar(piso, 0, faixa);
+    return a + (chanceDePassar(piso + 1, 0, faixa) - a) * frac;
+  }
   let passou = 0;
   let total = 0;
   for (let dificuldade = faixa.min; dificuldade <= faixa.max; dificuldade++) {

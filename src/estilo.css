@@ -1498,3 +1498,431 @@ h3,
     display: none;
   }
 }
+
+/* ============================================================ despacho
+ *
+ * A tela do modelo novo: a missão mostra o pentágono do que exige, e o jogador
+ * despacha 2 ou 3 da companhia contra ele. Tudo aqui serve a uma leitura só —
+ * *falta muito ou falta pouco?* — e por isso a exigência é contorno e o que o
+ * esquadrão põe é área preenchida: falta é buraco visível, não número menor.
+ */
+
+.radar-exigencia {
+  fill: none;
+  stroke: var(--sangue-claro);
+  stroke-width: 2;
+  stroke-dasharray: 5 4;
+  stroke-linejoin: round;
+}
+
+.radar-rotulo.cobrado {
+  font-size: 15px;
+}
+
+.radar-rotulo.folga {
+  opacity: 0.3;
+}
+
+/* ---------- a bolinha ---------- */
+
+.radar-bolinha {
+  fill: var(--ouro-claro);
+  stroke: var(--tinta);
+  stroke-width: 1.5;
+  filter: drop-shadow(0 0 5px rgba(227, 183, 92, 0.7));
+  /* Parte de onde estava sem o dado e vem até aqui. */
+  animation: bolinha-cai 0.9s cubic-bezier(0.34, 1.4, 0.5, 1) both;
+}
+
+.radar-bolinha.faltou {
+  fill: var(--sangue-claro);
+  filter: drop-shadow(0 0 5px rgba(207, 96, 88, 0.7));
+}
+
+/* Antes de rolar o dado, a bolinha só marca a posição: sem brilho, sem salto. */
+.radar-bolinha.parada {
+  fill: var(--bronze-claro);
+  filter: none;
+  animation: none;
+  opacity: 0.75;
+}
+
+@keyframes bolinha-cai {
+  0% {
+    transform: translate(var(--dx), var(--dy));
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  60% {
+    transform: translate(calc(var(--dx) * -0.12), calc(var(--dy) * -0.12));
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .radar-bolinha {
+    animation: none;
+  }
+}
+
+/* ---------- o cartão da missão ---------- */
+
+.missao {
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.missao::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(20, 17, 28, 0.55), rgba(20, 17, 28, 0.9));
+  z-index: 0;
+}
+
+.missao > * {
+  position: relative;
+  z-index: 1;
+}
+
+.missao-cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--e2);
+  font-size: var(--t-xs);
+  color: var(--bronze-claro);
+  text-transform: lowercase;
+}
+
+.missao h2 {
+  margin: var(--e2) 0 var(--e1);
+}
+
+.missao .abertura {
+  font-size: var(--t-sm);
+  font-style: italic;
+  color: var(--pergaminho-fraco);
+  line-height: 1.5;
+}
+
+/* ---------- o placar dos eixos ---------- */
+
+.placar-eixos {
+  width: 100%;
+  margin-top: var(--e3);
+  border-collapse: collapse;
+  font-family: var(--fonte-numero);
+  font-size: var(--t-xs);
+}
+
+.placar-eixos th,
+.placar-eixos td {
+  padding: 3px 4px;
+  text-align: right;
+}
+
+.placar-eixos thead th {
+  color: var(--bronze-claro);
+  font-weight: 400;
+  text-transform: lowercase;
+  border-bottom: 1px solid var(--couro);
+}
+
+.placar-eixos tbody th {
+  text-align: left;
+  font-weight: 400;
+  color: var(--pergaminho);
+}
+
+.placar-eixos .col-dado {
+  color: var(--arcano-claro);
+}
+
+.placar-eixos .alvo {
+  color: var(--sangue-claro);
+}
+
+.placar-eixos tr.cobre .saldo {
+  color: var(--ouro-claro);
+}
+
+.placar-eixos tr.falta .saldo {
+  color: var(--sangue-claro);
+  font-weight: 600;
+}
+
+.margem {
+  margin-top: var(--e2);
+  font-family: var(--fonte-numero);
+  font-size: var(--t-md);
+  text-align: center;
+}
+
+.margem i {
+  display: block;
+  font-family: var(--fonte-corpo);
+  font-size: var(--t-xs);
+  color: var(--bronze-claro);
+}
+
+.margem.boa {
+  color: var(--ouro-claro);
+}
+
+.margem.ma {
+  color: var(--sangue-claro);
+}
+
+/* ---------- as fichas dos heróis ---------- */
+
+.fichas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: var(--e2);
+}
+
+.ficha {
+  display: flex;
+  align-items: center;
+  gap: var(--e2);
+  padding: var(--e2);
+  background: var(--tinta-3);
+  border: 1px solid var(--couro);
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+}
+
+.ficha:hover:not(:disabled):not(.cheio) {
+  border-color: var(--bronze);
+  transform: translateY(-1px);
+}
+
+/* Quem vai fica marcado pela borda dourada, e não só por um contorno de foco:
+   é a informação que o jogador confere antes de confirmar o despacho. */
+.ficha.vai {
+  border-color: var(--ouro);
+  background: rgba(201, 150, 46, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(201, 150, 46, 0.4);
+}
+
+.ficha.cheio {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.ficha:disabled {
+  cursor: default;
+}
+
+.ficha-corpo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.ficha .nome {
+  font-family: var(--fonte-titulo);
+  font-size: var(--t-sm);
+  color: var(--pergaminho);
+}
+
+.ficha .meta {
+  font-size: var(--t-xs);
+  color: var(--bronze-claro);
+}
+
+.retrato.pequeno {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  border-radius: 8px;
+  background-size: cover;
+}
+
+.eixos-do-heroi {
+  display: flex;
+  gap: var(--e2);
+  margin-top: 2px;
+  font-family: var(--fonte-numero);
+  font-size: var(--t-xs);
+}
+
+.eixos-do-heroi span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
+}
+
+.eixos-do-heroi i {
+  font-style: normal;
+  color: var(--bronze-claro);
+  font-size: 0.85em;
+}
+
+.eixos-do-heroi b {
+  color: var(--ouro-claro);
+  font-weight: 600;
+}
+
+/* Atributo já comido pelo cansaço: o número mostrado é o que vale hoje. */
+.eixos-do-heroi b.gasto {
+  color: var(--sangue-claro);
+}
+
+/* ---------- o cansaço ---------- */
+
+.cansaco {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 0 0 auto;
+}
+
+.cansaco b {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--couro);
+}
+
+.cansaco b.gasto {
+  background: var(--sangue-claro);
+}
+
+.cansaco.inteiro b:first-child {
+  background: var(--bronze);
+}
+
+.cansaco.exausto b.gasto {
+  box-shadow: 0 0 5px var(--sangue-claro);
+}
+
+/* ---------- desfecho da missão ---------- */
+
+.acao {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--e2);
+}
+
+.botao.grande {
+  font-size: var(--t-md);
+  padding: var(--e2) var(--e4);
+}
+
+.ajuda.aviso {
+  color: var(--sangue-claro);
+}
+
+.desfecho .selo-resultado {
+  display: inline-block;
+  font-family: var(--fonte-titulo);
+  font-size: var(--t-sm);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--bronze-claro);
+  margin-bottom: var(--e2);
+}
+
+.desfecho.brilhante .selo-resultado { color: var(--ouro-claro); }
+.desfecho.custoso .selo-resultado { color: var(--ambar); }
+.desfecho.falha .selo-resultado,
+.desfecho.grave .selo-resultado { color: var(--sangue-claro); }
+
+.narracao {
+  font-size: var(--t-md);
+  line-height: 1.6;
+  color: var(--pergaminho);
+}
+
+.desfecho .caido,
+.desfecho-final .caido {
+  margin-top: var(--e2);
+  color: var(--sangue-claro);
+  font-style: italic;
+}
+
+.desfecho .botao {
+  margin-top: var(--e3);
+}
+
+.desfecho-final {
+  text-align: center;
+}
+
+/* A marca do teto: este eixo sobrou mais do que a missão aproveita. */
+.placar-eixos .teto {
+  font-style: normal;
+  color: var(--bronze-claro);
+  font-size: 0.8em;
+  margin-left: 2px;
+  cursor: help;
+}
+
+/* A fita das sete missões: onde a jornada está e o que já custou. */
+.fita {
+  display: flex;
+  gap: var(--e2);
+  justify-content: center;
+  margin-bottom: var(--e3);
+  font-size: var(--t-sm);
+  letter-spacing: 0.1em;
+}
+
+.fita span {
+  color: var(--bronze);
+}
+
+.fita span.agora {
+  color: var(--ouro-claro);
+  text-shadow: 0 0 8px rgba(227, 183, 92, 0.6);
+}
+
+/* O relato das sete no desfecho: uma linha por missão, na ordem em que caiu. */
+.relato-missoes {
+  list-style: none;
+  margin: var(--e4) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--e2);
+}
+
+.relato-missoes li {
+  border-left: 2px solid var(--couro);
+  padding-left: var(--e3);
+}
+
+.relato-missoes li.brilhante { border-left-color: var(--ouro-claro); }
+.relato-missoes li.custoso { border-left-color: var(--ambar); }
+.relato-missoes li.falha,
+.relato-missoes li.grave { border-left-color: var(--sangue-claro); }
+
+.relato-missoes b {
+  display: block;
+  font-family: var(--fonte-titulo);
+  font-size: var(--t-sm);
+  color: var(--pergaminho);
+  font-weight: 400;
+}
+
+.relato-missoes i {
+  font-size: var(--t-sm);
+  color: var(--pergaminho-fraco);
+}

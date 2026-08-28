@@ -4,41 +4,59 @@ import {
   moralDaParty,
   perfilDaParty,
   selo,
-  simularCampanha,
   sinergia,
   sortearCandidatos,
   textoDeCompartilhamento,
   todosOsHerois,
   type Candidato,
 } from './motor.ts';
+import {
+  CANSACO_MAXIMO,
+  ESQUADRAO_MAXIMO,
+  ESQUADRAO_MINIMO,
+  MAXIMO_DO_ESQUADRAO,
+  PESO_DO_CANSACO,
+  TETO_DA_SOBRA,
+  atributoEfetivo,
+  avancarCansaco,
+  cargasNovas,
+  chaveDoEpilogo,
+  cobrarBaixa,
+  comoCampanha,
+  contaDaMissao,
+  eixosCobrados,
+  exigenciaDaMissao,
+  resolverMissao,
+  sinergiaDoEsquadrao,
+  type Cansaco,
+  type Cargas,
+  type ContextoDaMissao,
+  type EntradaDaMissao,
+  type RelatoMissao,
+} from './despacho.ts';
 import { desenharCartao } from './cartao.ts';
-import { numerosHtml, radarHtml } from './radar.ts';
+import { numerosHtml, radarDespachoHtml, radarHtml } from './radar.ts';
 import { fundoDaCena, fundoDoRetrato } from './retrato.ts';
-import { diaDeHoje, numeroDoDia } from './rng.ts';
+import { diaDeHoje, hash, mulberry32, numeroDoDia } from './rng.ts';
 import {
   EIXOS,
   ICONE_TIPO,
-  MARCADOR_LANCE,
   MAXIMO_DA_PARTY,
   ROTULO_EIXO,
   ROTULO_ETIQUETA,
   ROTULO_TIPO,
   TAMANHO_PARTY,
-  TATICAS,
+  ROTULO_RESULTADO,
   TOLERANCIA_MORAL,
   TRACOS,
 } from './regras.ts';
 import type {
   BaseDeHerois,
-  Campanha,
   CatalogoDesafios,
   Desafio,
   Eixo,
   Recrutado,
-  RelatoEtapa,
-  RelatoLance,
   ResultadoEtapa,
-  Tatica,
 } from './tipos.ts';
 
 /**
@@ -93,7 +111,7 @@ const MARCADOR_ETAPA: Record<ResultadoEtapa, string> = {
 };
 
 interface Estado {
-  tela: 'inicio' | 'ajuda' | 'draft' | 'tatica' | 'jornada' | 'cartao';
+  tela: 'inicio' | 'ajuda' | 'draft' | 'jornada' | 'cartao';
   dia: string;
   treino: boolean;
   jornada: Desafio[];
@@ -101,19 +119,36 @@ interface Estado {
   rodada: number;
   tentativa: number;
   candidatos: Candidato[];
-  campanha: Campanha | null;
-  /** Até onde a jornada avançou. */
-  etapaAtual: number;
-  /** Aba aberta: o índice de uma prova, ou -1 para a tela de desfecho. */
-  etapaVista: number;
-  /** Lances da prova em curso que já mostraram resultado. */
-  lancesResolvidos: number;
-  /** Há um lance sendo decidido agora. */
+
+  /* --- a jornada de despacho --- */
+  /** Quem ainda esta de pe. */
+  vivos: Recrutado[];
+  cansaco: Cansaco;
+  /** As cargas que se gastam uma vez por jornada: amuleto, martir, teimoso. */
+  cargas: Cargas;
+  /** Em que missao a jornada esta, de 0 a 6. */
+  missao: number;
+  vitorias: number;
+  falhas: number;
+  /** Quem esta marcado para ir na missao atual. */
+  selecao: string[];
+  /** As missoes ja fechadas. */
+  relatos: RelatoMissao[];
+  /** A missao resolvida que esta na tela, ainda nao fechada. */
+  relato: RelatoMissao | null;
+  /** As bolinhas estao correndo: o desfecho ainda nao apareceu. */
   rolando: boolean;
-  /** A prova em curso terminou de rolar: só então o botão aparece. */
-  provaFechada: boolean;
   concluida: boolean;
-  tatica: Tatica;
+  /** Os ids de quem foi em cada missao. E o que o salvamento guarda. */
+  despachos: string[][];
+
+  /**
+   * O acaso e as frases vivem no estado porque a jornada avanca clique a
+   * clique: um gerador recriado a cada missao repetiria os mesmos dados, e um
+   * conjunto de frases recriado repetiria as mesmas linhas.
+   */
+  rnd: () => number;
+  frasesUsadas: Set<string>;
 }
 
 let dbHerois: BaseDeHerois;
@@ -126,9 +161,6 @@ const escapar = (t: string) => t.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)}
 const chaveSalva = (dia: string) => `ateotrono:${dia}`;
 const sinalMoral = (m: number) => (m > 0 ? `+${m}` : `${m}`);
 const comSinal = (n: number) => (n >= 0 ? `+${n}` : `${n}`);
-
-/** Índice da aba de desfecho, fora da faixa das provas. */
-const DESFECHO = -1;
 
 const eixosDoHeroi = (h: Recrutado): Record<Eixo, number> =>
   Object.fromEntries(EIXOS.map((e) => [e, h[e]])) as Record<Eixo, number>;
@@ -254,9 +286,6 @@ function telaInicio(): string {
 
 /** Todas as regras num lugar só. O jogo não se explica sozinho, e não deveria. */
 function telaAjuda(): string {
-  const tatica = (t: Tatica) =>
-    `<li><strong>${TATICAS[t].nome}</strong> — ${escapar(TATICAS[t].descricao)}</li>`;
-
   return `
     <div class="coluna-estreita">
       <div class="bloco ajuda-pagina">
@@ -267,8 +296,8 @@ function telaAjuda(): string {
           não acontece — e é o que o jogo pede.
         </p>
         <p class="aviso">
-          <strong>Falhar uma prova encerra a jornada na hora.</strong> Não se marcha
-          com a companhia em frangalhos: acabou ali, e o que faltava fica por fazer.
+          <strong>Falhar uma missão não encerra a jornada</strong> — mas cada uma
+          perdida deixa o Rei Demônio mais forte para o encontro final.
         </p>
 
         <h2>O recrutamento</h2>
@@ -306,23 +335,44 @@ function telaAjuda(): string {
           recusarem, a estrada traz outros quatro.
         </p>
 
-        <h2>Como um lance é resolvido</h2>
+        <h2>O despacho</h2>
         <p>
-          Cada prova tem três lances, e cada lance põe <strong>um eixo</strong> à prova:
-          ${EIXOS.map((e) => ROTULO_EIXO[e]).join(', ')}. O que decide é a
-          <strong>soma da companhia inteira</strong> naquele eixo — não o herói que a
-          narração acompanha.
+          As sete missões vêm uma a uma, e cada uma <strong>mostra o que exige</strong>:
+          um pentágono com o quanto ela pede de cada eixo
+          (${EIXOS.map((e) => ROTULO_EIXO[e]).join(', ')}). Você despacha
+          <strong>${ESQUADRAO_MINIMO} ou ${ESQUADRAO_MAXIMO} da companhia</strong> — a
+          última leva todos os que sobraram.
+        </p>
+        <p>
+          O que decide é a soma do <strong>esquadrão despachado</strong>, eixo por eixo,
+          contra o que a missão pede. Sinergia e traços contam só entre quem foi: os dois
+          da mesma franquia só se ajudam se marcharem juntos.
         </p>
         <p class="conta-exemplo">
-          soma do grupo + sinergia + traços + tática + moral + dado (−4 a +4)
-          <br />contra a dificuldade do lance
+          em cada eixo cobrado: soma do esquadrão + sinergia + traços + moral + dado (−4 a +4)
+          <br />contra o que a missão pede naquele eixo
         </p>
         <p>
-          Vence a prova quem resolver <strong>dois dos três lances</strong>. Passar o
-          mouse sobre um lance mostra a conta que o produziu.
+          Os saldos dos eixos somados dão a <strong>margem</strong> da missão. Sobrar
+          muito num eixo <strong>não compensa</strong> faltar noutro: cada eixo aproveita
+          no máximo ${TETO_DA_SOBRA} de sobra, e o resto se perde. Esquadrão torto perde
+          para esquadrão parelho.
         </p>
 
-        <h2>Os cinco desfechos de um lance</h2>
+        <h2>O cansaço</h2>
+        <p>
+          Quem é despachado volta cansado, e cada ponto de cansaço tira
+          ${PESO_DO_CANSACO} de <strong>cada atributo</strong> dele. Quem fica de fora
+          recupera um ponto. Ninguém fica indisponível — dá para insistir no time A e
+          pagar por isso.
+        </p>
+        <p>
+          É a decisão central do jogo: a missão final leva <strong>todos os que
+          sobraram</strong>, então chegar ao trono com a companhia inteira exausta é o
+          preço de nunca ter rodado o elenco.
+        </p>
+
+        <h2>Os cinco desfechos de uma missão</h2>
         <ul class="desfechos">
           <li><span class="marca brilhante">★</span> <strong>Brilhante</strong> — folgado demais para dar errado.</li>
           <li><span class="marca sucesso">●</span> <strong>Sucesso</strong> — resolvido.</li>
@@ -331,14 +381,11 @@ function telaAjuda(): string {
           <li><span class="marca grave">✝</span> <strong>Fracasso grave</strong> — não resolvido, e custou uma vida.</li>
         </ul>
         <p>
-          O dado é o azar puro: nove resultados igualmente prováveis, de −4 a +4. No pior
-          deles alguém pode tombar <strong>mesmo num lance vencido</strong> — é o que
-          impede que chegar ao trono e chegar inteiro sejam a mesma coisa.
+          O dado é o azar puro, e há <strong>um por eixo cobrado</strong>: nove resultados
+          igualmente prováveis, de −4 a +4. No pior deles alguém pode tombar
+          <strong>mesmo numa missão vencida</strong> — é o que impede que chegar ao trono
+          e chegar inteiro sejam a mesma coisa.
         </p>
-
-        <h2>A tática</h2>
-        <p>Vale para as sete provas, e é escolhida depois de fechar a companhia.</p>
-        <ul>${(Object.keys(TATICAS) as Tatica[]).map(tatica).join('')}</ul>
 
         <h2>O dia</h2>
         <p>
@@ -396,318 +443,301 @@ function telaDraft(): string {
     </div>`;
 }
 
-function telaTatica(): string {
-  return `
-    <div class="duas-colunas">
-      <aside class="lateral">
-        <div class="bloco">
-          <h2>Atributos somados</h2>
-          ${pentagonoHtml(178)}
-          <p class="ajuda" style="margin-top:10px">
-            Moral média ${sinalMoral(Math.round(moralDaParty(estado.party) * 10) / 10)} —
-            ${selo(moralDaParty(estado.party)).toLowerCase()}.
-          </p>
-        </div>
-      </aside>
-      <section class="principal">
-        <div class="bloco">
-          <h2>Como vocês marcham</h2>
-          <p class="ajuda">Vale para as sete provas. Decide entre chegar ao trono e chegar inteiro.</p>
-          <div class="escolhas" style="margin-top:14px">
-            ${(Object.keys(TATICAS) as Tatica[])
-              .map(
-                (t) => `<button class="escolha" data-tatica="${t}" aria-label="Tática ${TATICAS[t].nome}">
-                  <strong>${TATICAS[t].nome}</strong>
-                  <span>${escapar(TATICAS[t].descricao)}</span>
-                </button>`,
-              )
-              .join('')}
-          </div>
-        </div>
-      </section>
-    </div>
-    <div class="bloco">
-      <h2>A companhia</h2>
-      ${partyHtml()}
-    </div>`;
-}
-
 /* ------------------------------------------------------------------ jornada */
 
 /**
- * Quantos lances da prova já mostraram resultado. Na prova em curso é o
- * contador da sequência; nas já passadas, todos.
+ * A jornada de despacho.
+ *
+ * Diferença de fundo em relação ao modelo antigo: lá a campanha inteira era
+ * simulada de uma vez e a tela só a reproduzia; aqui **cada missão espera uma
+ * decisão do jogador**, então o estado avança de verdade a cada clique. É por
+ * isso que o salvamento guarda os despachos, e não só a party: sem eles não há
+ * como reconstituir a jornada.
  */
-function lancesVisiveis(indice: number): number {
-  if (indice > estado.etapaAtual && !estado.concluida) return 0;
-  if (indice < estado.etapaAtual || estado.concluida) {
-    return estado.campanha!.etapas[indice].lances.length;
-  }
-  return estado.lancesResolvidos;
+
+const contextoDaMissao = (): ContextoDaMissao => ({
+  prova: estado.jornada[estado.missao].tipo,
+  numero: estado.missao + 1,
+  totalDeMissoes: estado.jornada.length,
+  houveBaixa: estado.vivos.length < estado.party.length,
+});
+
+const exigenciaAtual = () =>
+  exigenciaDaMissao(estado.jornada[estado.missao], estado.missao, estado.falhas);
+
+const naUltimaMissao = () => estado.missao === estado.jornada.length - 1;
+
+/** Quem vai: na última, todo mundo que sobrou; nas outras, quem foi marcado. */
+function esquadraoAtual(): Recrutado[] {
+  if (naUltimaMissao()) return estado.vivos.slice();
+  return estado.vivos.filter((h) => estado.selecao.includes(h.id));
 }
 
-/* --------------------------------------------------- sequência dos lances */
-
-/** Suspense: o tempo em que o lance está sendo decidido, antes do resultado. */
-const MS_ROLAGEM = 1400;
-/** Tempo de leitura do resultado antes de o próximo lance começar a rolar. */
-const MS_LEITURA = 2100;
-/** Respiro antes de o botão da próxima prova aparecer. */
-const MS_ANTES_DO_BOTAO = 700;
-
-let sequencia: number | undefined;
-
-function pararSequencia() {
-  clearTimeout(sequencia);
-  sequencia = undefined;
-}
-
-/** Começa a rolar o lance seguinte da prova em curso. */
-function rolarProximo() {
-  const etapa = estado.campanha!.etapas[estado.etapaAtual];
-  if (estado.lancesResolvidos >= etapa.lances.length) {
-    estado.rolando = false;
-    sequencia = window.setTimeout(() => {
-      estado.provaFechada = true;
-      desenhar();
-    }, MS_ANTES_DO_BOTAO);
-    desenhar();
-    return;
-  }
-
-  estado.rolando = true;
-  desenhar();
-  sequencia = window.setTimeout(() => {
-    estado.lancesResolvidos++;
-    estado.rolando = false;
-    desenhar();
-    sequencia = window.setTimeout(rolarProximo, MS_LEITURA);
-  }, MS_ROLAGEM);
-}
-
-function comecarProva() {
-  pararSequencia();
-  estado.lancesResolvidos = 0;
-  estado.rolando = false;
-  estado.provaFechada = false;
-  rolarProximo();
-}
-
-/** A conta do lance por extenso, para o título do cartão. */
-function contaPorExtenso(l: RelatoLance): string {
-  const partes = [`${l.somaDoGrupo} do grupo`];
-  if (l.modificadores !== 0) partes.push(`${comSinal(l.modificadores)} de bônus`);
-  partes.push(`dado ${comSinal(l.dado)}`);
-  return `${partes.join(' · ')} = ${l.valor}, e pedia ${l.dificuldade}`;
+function entradaDaMissao(esquadrao: Recrutado[]): EntradaDaMissao {
+  return {
+    esquadrao,
+    desafio: estado.jornada[estado.missao],
+    exigencia: exigenciaAtual(),
+    cansaco: estado.cansaco,
+    moralDaParty: moralDaParty(estado.party),
+    ctx: contextoDaMissao(),
+  };
 }
 
 /**
- * A conta saiu do cartão: ocupava uma linha inteira do painel e o jogo se
- * entende sem ela. Fica no título, para quem quiser conferir de onde veio o
- * resultado de um lance.
+ * O medidor de cansaço. Pontinhos, não barra: o número é pequeno e inteiro, e
+ * contar três bolinhas é mais rápido que ler uma barra pela metade.
  */
-function lanceHtml(l: RelatoLance): string {
+function cansacoHtml(heroi: Recrutado): string {
+  const n = estado.cansaco[heroi.id] ?? 0;
+  const pontos = Array.from({ length: CANSACO_MAXIMO - 1 }, (_, i) =>
+    i < n ? '<b class="gasto"></b>' : '<b></b>',
+  ).join('');
+  const titulo = n === 0 ? 'descansado' : `cansaço ${n}: menos ${n * PESO_DO_CANSACO} em cada atributo`;
+  return `<span class="cansaco ${n === 0 ? 'inteiro' : n >= 3 ? 'exausto' : ''}"
+    title="${titulo}">${pontos}</span>`;
+}
+
+/** Os atributos do herói nos eixos que ESTA missão cobra, já com o cansaço. */
+function atributosNaMissaoHtml(heroi: Recrutado, cobrados: Eixo[]): string {
+  return `<span class="eixos-do-heroi">${cobrados
+    .map((e) => {
+      const agora = atributoEfetivo(heroi, e, estado.cansaco);
+      return `<span title="${ROTULO_EIXO[e]}">
+        <i>${ROTULO_EIXO[e].slice(0, 3).toUpperCase()}</i>
+        <b class="${agora < heroi[e] ? 'gasto' : ''}">${agora}</b>
+      </span>`;
+    })
+    .join('')}</span>`;
+}
+
+function fichaHtml(heroi: Recrutado, cobrados: Eixo[]): string {
+  const vai = estado.selecao.includes(heroi.id) || naUltimaMissao();
+  const cheio = estado.selecao.length >= ESQUADRAO_MAXIMO && !vai;
+  const travado = naUltimaMissao() || estado.relato !== null;
   return `
-    <li class="lance ${l.resultado}" title="${escapar(contaPorExtenso(l))}">
-      <div class="lance-eixo">${ROTULO_EIXO[l.eixo]}</div>
-      <div class="lance-cena">${escapar(l.cena)}</div>
-      <div class="lance-desfecho">
-        <span class="marca">${MARCADOR_LANCE[l.resultado]}</span> ${escapar(l.narracao)}
-      </div>
-    </li>`;
+    <button class="ficha ${vai ? 'vai' : ''} ${cheio ? 'cheio' : ''}"
+      data-alternar="${heroi.id}" ${travado ? 'disabled' : ''}
+      aria-pressed="${vai}" aria-label="${escapar(heroi.nome)}${vai ? ', despachado' : ''}">
+      ${retratoHtml(heroi, 'pequeno')}
+      <span class="ficha-corpo">
+        <span class="nome">${escapar(heroi.nome)}</span>
+        <span class="meta" title="${escapar(TRACOS[heroi.traco].descricao)}">${TRACOS[heroi.traco].nome}</span>
+        ${atributosNaMissaoHtml(heroi, cobrados)}
+      </span>
+      ${cansacoHtml(heroi)}
+    </button>`;
 }
 
-/**
- * O lance ainda sendo decidido: a cena já está posta, o desfecho não. O dado
- * girando é o mesmo dado do motor — é ele que decide, e mostrar isso vale mais
- * que revelar o número.
- */
-function lanceRolandoHtml(l: RelatoLance): string {
+/** A fita das sete missões: onde a jornada está e o que já custou. */
+function fitaHtml(): string {
+  return `<div class="fita">${estado.jornada
+    .map((_, i) => {
+      const r = estado.relatos[i];
+      const marca = r
+        ? MARCADOR_ETAPA[r.venceu ? (r.caido ? 'vitoria-custosa' : 'vitoria-limpa') : 'derrota']
+        : i === estado.missao
+          ? '◆'
+          : '·';
+      return `<span class="${i === estado.missao && !estado.concluida ? 'agora' : ''}">${marca}</span>`;
+    })
+    .join('')}</div>`;
+}
+
+function telaDespacho(): string {
+  const desafio = estado.jornada[estado.missao];
+  const exigencia = exigenciaAtual();
+  const cobrados = eixosCobrados(exigencia);
+  const esquadrao = esquadraoAtual();
+  const dados = estado.relato && !estado.rolando ? estado.relato.dados : undefined;
+  const conta = esquadrao.length ? contaDaMissao(entradaDaMissao(esquadrao), dados) : null;
+  const somas =
+    conta?.somas ?? (Object.fromEntries(EIXOS.map((e) => [e, 0])) as Record<Eixo, number>);
+
+  /**
+   * O saldo mostrado já leva o teto da sobra, e a margem é a soma exata desta
+   * coluna. Com o saldo cru a tabela não fechava com o total, e a regra de que
+   * sobra demais num eixo é desperdiçada virava mágica em vez de lição.
+   */
+  const linhas = cobrados
+    .map((e) => {
+      const posto = somas[e];
+      const dado = dados?.[e];
+      const cru = posto + (dado ?? 0) - exigencia[e];
+      const aproveitado = Math.min(cru, TETO_DA_SOBRA);
+      return `<tr class="${aproveitado >= 0 ? 'cobre' : 'falta'}">
+        <th>${ROTULO_EIXO[e]}</th>
+        <td class="num">${posto}</td>
+        <td class="col-dado">${dado === undefined ? '' : comSinal(dado)}</td>
+        <td class="num alvo">${exigencia[e]}</td>
+        <td class="num saldo">${comSinal(aproveitado)}${
+          cru > aproveitado
+            ? `<i class="teto" title="sobrou ${comSinal(cru)}, mas cada eixo aproveita no máximo ${TETO_DA_SOBRA}">&#9656;</i>`
+            : ''
+        }</td>
+      </tr>`;
+    })
+    .join('');
+
+  const { motivos, bonus } = sinergiaDoEsquadrao(esquadrao);
+  const margem = dados ? conta?.margem : conta?.margemSemDado;
+
   return `
-    <li class="lance rolando" aria-live="polite">
-      <div class="lance-eixo">${ROTULO_EIXO[l.eixo]}</div>
-      <div class="lance-cena">${escapar(l.cena)}</div>
-      <div class="lance-decidindo">
-        <span class="dado" aria-hidden="true"><i>⚀</i><i>⚁</i><i>⚂</i><i>⚃</i><i>⚄</i><i>⚅</i></span>
-        <span class="decidindo-texto">decidindo</span>
-      </div>
-    </li>`;
+    <div class="duas-colunas despacho">
+      <aside class="lateral">
+        <div class="bloco missao" style="background-image:${fundoDaCena(desafio.id, desafio.tipo)}">
+          <div class="missao-cabecalho">
+            <span class="tipo">${ICONE_TIPO[desafio.tipo]} ${ROTULO_TIPO[desafio.tipo]}</span>
+            <span class="contador">Missão ${estado.missao + 1} de ${estado.jornada.length}</span>
+          </div>
+          <h2>${escapar(desafio.nome)}</h2>
+          <p class="abertura">${escapar(desafio.abertura)}</p>
+        </div>
+
+        <div class="bloco">
+          <div class="radar-caixa grande">
+            ${radarDespachoHtml({
+              tamanho: 240,
+              exigencia,
+              somas,
+              dados,
+              maximo: MAXIMO_DO_ESQUADRAO,
+              titulo: `O que ${desafio.nome} exige`,
+            })}
+          </div>
+          <table class="placar-eixos">
+            <thead><tr><th>eixo</th><th>põe</th><th>dado</th><th>pede</th><th>saldo</th></tr></thead>
+            <tbody>${linhas}</tbody>
+          </table>
+          ${
+            conta
+              ? `<p class="margem ${(margem ?? 0) >= 0 ? 'boa' : 'ma'}">
+                   Margem ${comSinal(margem ?? 0)}
+                   ${dados ? '' : '<i>antes do dado</i>'}
+                 </p>`
+              : `<p class="ajuda">Marque ${ESQUADRAO_MINIMO} ou ${ESQUADRAO_MAXIMO} para ver a conta.</p>`
+          }
+        </div>
+      </aside>
+
+      <section class="principal">
+        <div class="bloco">
+          <div class="guilda-cabecalho">
+            <h2>${naUltimaMissao() ? 'Todos os que sobraram' : 'Quem vai'}</h2>
+            <span class="ajuda">${
+              naUltimaMissao()
+                ? 'o trono não aceita esquadrão'
+                : `${esquadrao.length} de ${ESQUADRAO_MINIMO}&ndash;${ESQUADRAO_MAXIMO} · quem fica, descansa`
+            }</span>
+          </div>
+          ${fitaHtml()}
+          <div class="fichas">${estado.vivos.map((h) => fichaHtml(h, cobrados)).join('')}</div>
+          ${
+            motivos.length
+              ? `<p class="ajuda sinergia">Sinergia ${comSinal(bonus)}: ${motivos.map(escapar).join('; ')}.</p>`
+              : ''
+          }
+        </div>
+
+        ${
+          estado.relato && !estado.rolando
+            ? `<div class="bloco desfecho ${estado.relato.resultado}">
+                 <span class="selo-resultado">${ROTULO_RESULTADO[estado.relato.resultado]}</span>
+                 <p class="narracao">${escapar(estado.relato.narracao)}</p>
+                 ${
+                   estado.relato.caido
+                     ? `<p class="caido">${escapar(estado.relato.caido.nome)} não volta.</p>`
+                     : ''
+                 }
+                 <button class="botao" data-avancar="1">${
+                   naUltimaMissao() ? 'Ver o desfecho' : 'Próxima missão'
+                 }</button>
+               </div>`
+            : `<div class="bloco acao">
+                 <button class="botao grande" data-despachar="1"
+                   ${esquadrao.length >= ESQUADRAO_MINIMO && !estado.rolando ? '' : 'disabled'}>
+                   ${estado.rolando ? 'A missão corre…' : naUltimaMissao() ? 'Enfrentar o Rei Demônio' : 'Despachar'}
+                 </button>
+                 ${
+                   estado.falhas > 0
+                     ? `<p class="ajuda aviso">${estado.falhas} ${
+                         estado.falhas === 1 ? 'missão perdida' : 'missões perdidas'
+                       } &mdash; o Rei Demônio está mais forte.</p>`
+                     : ''
+                 }
+               </div>`
+        }
+      </section>
+    </div>`;
 }
 
-function textoFecho(e: RelatoEtapa): string {
-  if (e.resultado === 'nao-jogada') return 'A companhia não chegou até aqui.';
-  if (e.resultado === 'derrota') return `Derrota — ${e.sucessos} de ${e.desafio.lances.length} lances.`;
-  if (e.caidos.length === 0) return `Vitória limpa — ${e.sucessos} de ${e.desafio.lances.length} lances.`;
-  return `Vitória — ${e.sucessos} de ${e.desafio.lances.length}, e ${e.caidos
-    .map((h) => h.nome)
-    .join(', ')} ficou pelo caminho.`;
-}
-
-/** Quem ainda está de pé quando a etapa aberta começou. */
-function estadoDaParty(indice: number): { heroi: Recrutado; caido: boolean }[] {
-  const caidos = new Set<string>();
-  const campanha = estado.campanha!;
-  for (let i = 0; i <= indice; i++) {
-    const etapa = campanha.etapas[i];
-    const ate = i === indice ? lancesVisiveis(i) : etapa.lances.length;
-    etapa.lances.slice(0, ate).forEach((l) => l.caido && caidos.add(l.caido.id));
-  }
-  return estado.party.map((h) => ({ heroi: h, caido: caidos.has(h.id) }));
-}
-
-/** A tela de fim: a companhia que sobrou e o epílogo. Não repete a última prova. */
 function desfechoHtml(): string {
-  const campanha = estado.campanha!;
-  const { titulo, texto, selo: fecho } = epilogo(campanha);
-  const venceu = campanha.vitorias === campanha.etapas.length;
+  const campanha = comoCampanha(estado.relatos, estado.party, estado.jornada);
+  const { titulo, texto, selo: fecho } = epilogo(
+    campanha,
+    chaveDoEpilogo(campanha, estado.jornada.length),
+  );
+  const venceu = campanha.etapas[estado.jornada.length - 1]?.resultado !== 'derrota';
+  const caidos = new Set(campanha.etapas.flatMap((e) => e.caidos.map((h) => h.id)));
 
   return `
-    <aside class="cena ornado">
-      <div class="cena-arte" style="background-image:${fundoDaCena(
-        'desfecho',
-        venceu ? 'trono' : 'travessia',
-      )}">
-        <span class="cena-tipo">${venceu ? 'O trono caiu' : 'Fim da estrada'}</span>
-      </div>
-      <h2 class="cena-titulo">A companhia</h2>
-      <p class="cena-texto">${escapar(selo(campanha.moralDaParty))} · moral média ${sinalMoral(
-        Math.round(campanha.moralDaParty * 10) / 10,
-      )}</p>
-      <ul class="party-estado">
-        ${estadoDaParty(estado.etapaAtual)
-          .map(
-            ({ heroi, caido }) => `<li class="${caido ? 'caido' : ''}">
-              ${retratoHtml(heroi, 'medio')}
-              <span class="nome">${escapar(heroi.nome)}</span>
-              ${caido ? '<span class="cruz">✝</span>' : ''}
-            </li>`,
-          )
-          .join('')}
-      </ul>
-    </aside>
+    <div class="duas-colunas">
+      <aside class="cena ornado">
+        <div class="cena-arte" style="background-image:${fundoDaCena(
+          'desfecho',
+          venceu ? 'trono' : 'travessia',
+        )}">
+          <span class="cena-tipo">${venceu ? 'O trono caiu' : 'O trono resistiu'}</span>
+        </div>
+        <h2 class="cena-titulo">A companhia</h2>
+        <p class="cena-texto">${escapar(selo(campanha.moralDaParty))} · moral média ${sinalMoral(
+          Math.round(campanha.moralDaParty * 10) / 10,
+        )}</p>
+        <ul class="party-estado">
+          ${estado.party
+            .map(
+              (heroi) => `<li class="${caidos.has(heroi.id) ? 'caido' : ''}">
+                ${retratoHtml(heroi, 'medio')}
+                <span class="nome">${escapar(heroi.nome)}</span>
+                ${caidos.has(heroi.id) ? '<span class="cruz">&#10013;</span>' : ''}
+              </li>`,
+            )
+            .join('')}
+        </ul>
+      </aside>
 
-    <section class="painel ornado">
-      <div class="placar ${campanha.perfeita ? 'perfeito' : ''}">
-        <div class="grade">${campanha.etapas.map((e) => MARCADOR_ETAPA[e.resultado]).join('')}</div>
-      </div>
-      <div class="epilogo">
-        <h3>${escapar(titulo)}</h3>
-        <p>${escapar(texto)}</p>
-        ${fecho ? `<p class="epilogo-selo">${escapar(fecho)}</p>` : ''}
-      </div>
-      <div class="painel-acao">
-        <button class="botao" data-gerar-cartao="1">Gerar o cartão</button>
-        <button class="botao secundario" data-compartilhar="1">Copiar só o texto</button>
-        <button class="botao secundario" data-treino="1">Marchar num dia qualquer</button>
-      </div>
-    </section>`;
+      <section class="painel ornado">
+        <div class="placar ${campanha.perfeita ? 'perfeito' : ''}">
+          <div class="grade">${campanha.etapas.map((e) => MARCADOR_ETAPA[e.resultado]).join('')}</div>
+        </div>
+        <div class="epilogo">
+          <h3>${escapar(titulo)}</h3>
+          <p>${escapar(texto)}</p>
+          ${fecho ? `<p class="epilogo-selo">${escapar(fecho)}</p>` : ''}
+        </div>
+        <ol class="relato-missoes">
+          ${estado.relatos
+            .map(
+              (r) => `<li class="${r.resultado}">
+                <b>${escapar(r.desafio.nome)}</b>
+                <i>${escapar(r.narracao)}</i>
+              </li>`,
+            )
+            .join('')}
+        </ol>
+        <div class="painel-acao">
+          <button class="botao" data-gerar-cartao="1">Gerar o cartão</button>
+          <button class="botao secundario" data-compartilhar="1">Copiar só o texto</button>
+          <button class="botao secundario" data-treino="1">Marchar num dia qualquer</button>
+        </div>
+      </section>
+    </div>`;
 }
 
 function telaJornada(): string {
-  const campanha = estado.campanha!;
-  const i = estado.etapaVista;
-  const noDesfecho = i === DESFECHO;
-  const etapa = campanha.etapas[noDesfecho ? estado.etapaAtual : i];
-  const visiveis = noDesfecho ? 0 : lancesVisiveis(i);
-  const olhandoPassado = !noDesfecho && i !== estado.etapaAtual;
-  const emCurso = !noDesfecho && i === estado.etapaAtual && !estado.concluida;
-  const alcancada = noDesfecho || i <= estado.etapaAtual || estado.concluida;
-  const provaTerminou = !emCurso || estado.provaFechada;
-
-  const abas = campanha.etapas
-    .map((e, k) => {
-      // Prova que a jornada não alcançou continua trancada mesmo no fim.
-      const liberada = k <= estado.etapaAtual;
-      const marca =
-        estado.concluida || k < estado.etapaAtual ? MARCADOR_ETAPA[e.resultado] : ICONE_TIPO[e.desafio.tipo];
-      return `<button class="aba ${k === i ? 'aberta' : ''} ${liberada ? '' : 'trancada'}"
-        data-aba="${k}" ${liberada ? '' : 'disabled'}
-        aria-label="Prova ${k + 1}${liberada ? `: ${e.desafio.nome}` : ', ainda não alcançada'}">
-        <span class="aba-num">${k + 1}</span>
-        <span class="aba-marca">${liberada ? marca : '·'}</span>
-      </button>`;
-    })
-    .join('') +
-    (estado.concluida
-      ? `<button class="aba desfecho ${noDesfecho ? 'aberta' : ''}" data-aba="${DESFECHO}"
-           aria-label="Desfecho da jornada">
-           <span class="aba-num">fim</span>
-           <span class="aba-marca">⚜️</span>
-         </button>`
-      : '');
-
-  const emAndamento = campanha.etapas[estado.etapaAtual];
-  const caiuAqui = emAndamento.resultado === 'derrota';
-  // O botão só existe depois de a prova terminar de rolar. Antes disso, nada
-  // no painel convida a pular o que ainda está sendo decidido.
-  const acao = estado.concluida
-    ? `<button class="botao" data-aba="${DESFECHO}">Ver o desfecho</button>`
-    : olhandoPassado
-      ? `<button class="botao" data-voltar="1">Voltar para a prova ${estado.etapaAtual + 1}</button>`
-      : !estado.provaFechada
-        ? ''
-        : caiuAqui || estado.etapaAtual >= campanha.etapas.length - 1
-          ? `<button class="botao" data-avancar="1">Ver o desfecho</button>`
-          : `<button class="botao" data-avancar="1">Seguir para a prova ${estado.etapaAtual + 2}</button>`;
-
-  return `
-    <div class="jornada">
-      <div class="jornada-topo">
-        <span class="painel-titulo">A jornada</span>
-        <span class="painel-placar">${
-          estado.concluida
-            ? 'fim da estrada'
-            : `prova <b>${estado.etapaAtual + 1}</b> de ${campanha.etapas.length}`
-        }</span>
-      </div>
-      <nav class="abas" aria-label="Provas da jornada">${abas}</nav>
-
-      <div class="jornada-corpo">
-        ${
-          noDesfecho
-            ? desfechoHtml()
-            : `<aside class="cena ornado">
-          <div class="cena-arte" style="background-image:${fundoDaCena(etapa.desafio.id, etapa.desafio.tipo)}">
-            <span class="cena-tipo">${ROTULO_TIPO[etapa.desafio.tipo]}</span>
-          </div>
-          <h2 class="cena-titulo">${etapa.numero}. ${escapar(etapa.desafio.nome)}</h2>
-          <p class="cena-texto">${escapar(etapa.desafio.abertura)}</p>
-          <ul class="party-estado">
-            ${estadoDaParty(i)
-              .map(
-                ({ heroi, caido }) => `<li class="${caido ? 'caido' : ''}">
-                  ${retratoHtml(heroi, 'medio')}
-                  <span class="nome">${escapar(heroi.nome)}</span>
-                  ${caido ? '<span class="cruz">✝</span>' : ''}
-                </li>`,
-              )
-              .join('')}
-          </ul>
-        </aside>
-
-        <section class="painel ornado">
-          <ol class="lances">
-            ${etapa.lances
-              .slice(0, visiveis)
-              .map((l) => lanceHtml(l))
-              .join('')}
-            ${emCurso && estado.rolando ? lanceRolandoHtml(etapa.lances[visiveis]) : ''}
-            ${
-              !alcancada
-                ? `<li class="lance-vazio">A companhia ainda não chegou aqui.</li>`
-                : provaTerminou
-                  ? `<li class="etapa-fecho ${etapa.resultado}">
-                       ${MARCADOR_ETAPA[etapa.resultado]} ${escapar(textoFecho(etapa))}
-                     </li>`
-                  : ''
-            }
-          </ol>
-          ${acao ? `<div class="painel-acao">${acao}</div>` : ''}
-        </section>`
-        }
-      </div>
-    </div>`;
+  return estado.concluida ? desfechoHtml() : telaDespacho();
 }
+
 
 /* ------------------------------------------------------------------ desenho */
 
@@ -734,7 +764,6 @@ function desenhar() {
     ajuda: telaAjuda,
     cartao: telaCartao,
     draft: telaDraft,
-    tatica: telaTatica,
     jornada: telaJornada,
   };
 
@@ -747,23 +776,30 @@ function desenhar() {
 /* ------------------------------------------------------------------- ações */
 
 function estadoNovo(dia: string, treino: boolean): Estado {
+  const party: Recrutado[] = [];
   return {
     tela: 'draft',
     dia,
     treino,
     jornada: jornadaDoDia(catalogo, dia),
-    party: [],
+    party,
     rodada: 0,
     tentativa: 0,
     candidatos: [],
-    campanha: null,
-    etapaAtual: 0,
-    etapaVista: 0,
-    lancesResolvidos: 0,
+    vivos: party,
+    cansaco: {},
+    cargas: cargasNovas(),
+    missao: 0,
+    vitorias: 0,
+    falhas: 0,
+    selecao: [],
+    relatos: [],
+    relato: null,
     rolando: false,
-    provaFechada: false,
     concluida: false,
-    tatica: 'equilibrada',
+    despachos: [],
+    rnd: mulberry32(hash(`despacho:${dia}`)),
+    frasesUsadas: new Set(),
   };
 }
 
@@ -775,12 +811,12 @@ let cartaoPronto: HTMLCanvasElement | null = null;
 
 function montarCartao() {
   const alvo = app.querySelector<HTMLImageElement>('img.cartao');
-  if (!alvo || !estado.campanha) return;
-  const { titulo, texto } = epilogo(estado.campanha);
+  if (!alvo || estado.relatos.length === 0) return;
+  const campanha = comoCampanha(estado.relatos, estado.party, estado.jornada);
+  const { titulo, texto } = epilogo(campanha, chaveDoEpilogo(campanha, estado.jornada.length));
   cartaoPronto = desenharCartao({
-    campanha: estado.campanha,
+    campanha,
     party: estado.party,
-    tatica: estado.tatica,
     numeroDoDia: numeroDoDia(estado.dia),
     titulo,
     remate: texto,
@@ -827,7 +863,10 @@ function recrutar(indice: number) {
   estado.tentativa = 0;
 
   if (estado.party.length >= TAMANHO_PARTY) {
-    estado.tela = 'tatica';
+    estado.tela = 'jornada';
+    estado.vivos = estado.party.slice();
+    estado.cansaco = Object.fromEntries(estado.party.map((h) => [h.id, 0]));
+    guardarJornada();
   } else {
     estado.candidatos = sortearCandidatos(dbHerois, estado.dia, estado.rodada, estado.party);
   }
@@ -846,53 +885,101 @@ function resortear() {
   desenhar();
 }
 
-function resolver(tatica: Tatica) {
-  estado.campanha = simularCampanha(estado.party, tatica, estado.dia, estado.jornada);
-  estado.tatica = tatica;
-  estado.tela = 'jornada';
-  estado.etapaAtual = 0;
-  estado.etapaVista = 0;
-  estado.concluida = false;
-
-  if (!estado.treino) {
-    localStorage.setItem(
-      chaveSalva(estado.dia),
-      JSON.stringify({ heroisIds: estado.party.map((h) => h.id), tatica }),
-    );
-  }
-  comecarProva();
-}
-
-/** O botão vira a página, e só. A prova aberta já está toda à vista. */
-function avancar() {
-  const campanha = estado.campanha!;
-  const etapa = campanha.etapas[estado.etapaAtual];
-  const fim = etapa.resultado === 'derrota' || estado.etapaAtual >= campanha.etapas.length - 1;
-
-  if (fim) {
-    pararSequencia();
-    estado.concluida = true;
-    estado.etapaVista = DESFECHO;
-    desenhar();
-  } else {
-    estado.etapaAtual++;
-    estado.etapaVista = estado.etapaAtual;
-    comecarProva();
-  }
-}
-
-function abrirAba(indice: number) {
-  if (indice === DESFECHO && !estado.concluida) return;
-  if (indice !== DESFECHO && indice > estado.etapaAtual) return;
-  estado.etapaVista = indice;
+function alternarDespacho(id: string) {
+  if (naUltimaMissao() || estado.relato) return;
+  const i = estado.selecao.indexOf(id);
+  if (i >= 0) estado.selecao.splice(i, 1);
+  else if (estado.selecao.length < ESQUADRAO_MAXIMO) estado.selecao.push(id);
   desenhar();
+}
+
+/** Suspense: o tempo em que as bolinhas correm, antes de o desfecho aparecer. */
+const MS_ROLAGEM = 1100;
+let sequencia: number | undefined;
+
+function pararSequencia() {
+  clearTimeout(sequencia);
+  sequencia = undefined;
+}
+
+function despachar(esquadrao = esquadraoAtual(), animar = true) {
+  if (esquadrao.length < ESQUADRAO_MINIMO) return;
+
+  const { relato, amuletoGasto } = resolverMissao(
+    entradaDaMissao(esquadrao),
+    estado.rnd,
+    estado.frasesUsadas,
+    estado.cargas.amuletoDisponivel,
+  );
+  if (amuletoGasto) estado.cargas.amuletoDisponivel = false;
+  cobrarBaixa(relato, estado.vivos, estado.cargas);
+
+  estado.relato = relato;
+  estado.despachos.push(esquadrao.map((h) => h.id));
+
+  if (!animar) {
+    estado.rolando = false;
+    return;
+  }
+  // As bolinhas correm primeiro, o desfecho vem depois: a mesma divisão em
+  // duas fases do jogo antigo — a cena, e então o que ela custou.
+  estado.rolando = true;
+  desenhar();
+  sequencia = window.setTimeout(() => {
+    estado.rolando = false;
+    desenhar();
+  }, MS_ROLAGEM);
+}
+
+/** Fecha a missão que está na tela e prepara a seguinte. */
+function encerrarMissao() {
+  const relato = estado.relato!;
+  if (relato.caido) estado.vivos = estado.vivos.filter((h) => h.id !== relato.caido!.id);
+  if (relato.venceu) estado.vitorias++;
+  else estado.falhas++;
+
+  estado.relatos.push(relato);
+  estado.cansaco = avancarCansaco(estado.cansaco, estado.vivos, relato.esquadrao);
+  estado.relato = null;
+  estado.selecao = [];
+  estado.missao++;
+}
+
+function avancar() {
+  pararSequencia();
+  encerrarMissao();
+  guardarJornada();
+
+  // Sem gente de pé para formar esquadrão, a jornada acaba onde está.
+  if (estado.missao >= estado.jornada.length || estado.vivos.length < ESQUADRAO_MINIMO) {
+    estado.concluida = true;
+  }
+  desenhar();
+}
+
+/**
+ * O salvamento guarda **quem foi em cada missão**, não só a party.
+ *
+ * No jogo antigo bastavam os cinco nomes: a campanha era determinística a
+ * partir deles. Aqui as decisões são do jogador, então sem os despachos não há
+ * como reconstituir a jornada — e é justamente por haver decisões que uma por
+ * dia faz sentido.
+ */
+function guardarJornada() {
+  if (estado.treino) return;
+  localStorage.setItem(
+    chaveSalva(estado.dia),
+    JSON.stringify({ heroisIds: estado.party.map((h) => h.id), despachos: estado.despachos }),
+  );
 }
 
 function restaurarSalva(): boolean {
   const bruto = localStorage.getItem(chaveSalva(diaDeHoje()));
   if (!bruto) return false;
   try {
-    const salva = JSON.parse(bruto) as { heroisIds: string[]; tatica: Tatica };
+    const salva = JSON.parse(bruto) as { heroisIds: string[]; despachos?: string[][] };
+    if (!salva.despachos) return false; // jornada do modelo antigo: não se reencena
+
     const dia = diaDeHoje();
     const porId = new Map(todosOsHerois(dbHerois).map((h) => [h.id, h]));
     const party = salva.heroisIds
@@ -902,14 +989,20 @@ function restaurarSalva(): boolean {
 
     estado = estadoNovo(dia, false);
     estado.party = party;
-    estado.campanha = simularCampanha(party, salva.tatica, dia, estado.jornada);
-    estado.tatica = salva.tatica;
+    estado.vivos = party.slice();
+    estado.cansaco = Object.fromEntries(party.map((h) => [h.id, 0]));
     estado.tela = 'jornada';
-    estado.concluida = true;
-    estado.provaFechada = true;
-    const parou = estado.campanha.etapas.findIndex((e) => e.resultado === 'derrota');
-    estado.etapaAtual = parou >= 0 ? parou : estado.campanha.etapas.length - 1;
-    estado.etapaVista = DESFECHO;
+
+    // Reencena os mesmos despachos: mesma seed, mesmos dados, mesmo desfecho.
+    for (const ids of salva.despachos) {
+      if (estado.missao >= estado.jornada.length) break;
+      const esquadrao = estado.vivos.filter((h) => ids.includes(h.id));
+      if (esquadrao.length === 0) break;
+      despachar(esquadrao, false);
+      encerrarMissao();
+    }
+    estado.concluida =
+      estado.missao >= estado.jornada.length || estado.vivos.length < ESQUADRAO_MINIMO;
     desenhar();
     return true;
   } catch {
@@ -918,7 +1011,10 @@ function restaurarSalva(): boolean {
 }
 
 async function compartilhar() {
-  const texto = textoDeCompartilhamento(estado.campanha!, numeroDoDia(estado.dia));
+  const texto = textoDeCompartilhamento(
+    comoCampanha(estado.relatos, estado.party, estado.jornada),
+    numeroDoDia(estado.dia),
+  );
   const botao = app.querySelector<HTMLButtonElement>('[data-compartilhar]');
   try {
     await navigator.clipboard.writeText(texto);
@@ -938,7 +1034,7 @@ async function compartilhar() {
 }
 
 app.addEventListener('click', (evento) => {
-  const alvo = (evento.target as HTMLElement).closest<HTMLElement>('[data-acao], button[data-recrutar], button[data-aba], button[data-comecar], button[data-resortear], button[data-tatica], button[data-avancar], button[data-voltar], button[data-compartilhar], button[data-treino], button[data-ver-salva], button[data-ajuda], button[data-voltar-inicio], button[data-copiar-imagem], button[data-baixar-imagem], button[data-gerar-cartao], button[data-voltar-desfecho]');
+  const alvo = (evento.target as HTMLElement).closest<HTMLElement>('[data-acao], button[data-recrutar], button[data-aba], button[data-comecar], button[data-resortear], button[data-alternar], button[data-despachar], button[data-avancar], button[data-voltar], button[data-compartilhar], button[data-treino], button[data-ver-salva], button[data-ajuda], button[data-voltar-inicio], button[data-copiar-imagem], button[data-baixar-imagem], button[data-gerar-cartao], button[data-voltar-desfecho]');
   if (!alvo) return;
 
   if (alvo.dataset.ajuda) {
@@ -953,20 +1049,17 @@ app.addEventListener('click', (evento) => {
     recrutar(Number(alvo.dataset.recrutar));
   } else if (alvo.dataset.resortear) {
     resortear();
-  } else if (alvo.dataset.tatica) {
-    resolver(alvo.dataset.tatica as Tatica);
+  } else if (alvo.dataset.alternar) {
+    alternarDespacho(alvo.dataset.alternar);
+  } else if (alvo.dataset.despachar) {
+    despachar();
   } else if (alvo.dataset.avancar) {
     avancar();
-  } else if (alvo.dataset.voltar) {
-    abrirAba(estado.etapaAtual);
-  } else if (alvo.dataset.aba) {
-    abrirAba(Number(alvo.dataset.aba));
   } else if (alvo.dataset.gerarCartao) {
     estado.tela = 'cartao';
     desenhar();
   } else if (alvo.dataset.voltarDesfecho) {
     estado.tela = 'jornada';
-    estado.etapaVista = DESFECHO;
     desenhar();
   } else if (alvo.dataset.copiarImagem) {
     void copiarImagem(alvo as HTMLButtonElement);

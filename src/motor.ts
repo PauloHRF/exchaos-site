@@ -505,7 +505,15 @@ const EMOJI: Record<ResultadoEtapa, string> = {
  * O texto de fecho da jornada, escolhido pelo tipo de fim: quem salvou o mundo
  * e a que preço, ou em que altura a estrada acabou.
  */
-export function epilogo(campanha: Campanha): { titulo: string; texto: string; selo: string } {
+export function epilogo(
+  campanha: Campanha,
+  /**
+   * A chave, quando quem chama sabe escolher melhor. O modelo de despacho sabe:
+   * as chaves de fim subito daqui — `quase-la`, `meio-caminho` — descrevem onde
+   * a estrada parou, e la ela nunca para.
+   */
+  chaveDeFora?: ChaveEpilogo,
+): { titulo: string; texto: string; selo: string } {
   const caidos = campanha.etapas.flatMap((e) => e.caidos.map((h) => h.nome));
   const parou = campanha.etapas.find((e) => e.resultado === 'derrota');
   const total = campanha.etapas.length;
@@ -527,6 +535,7 @@ export function epilogo(campanha: Campanha): { titulo: string; texto: string; se
             : 'jornada-curta';
   }
 
+  if (chaveDeFora) chave = chaveDeFora;
   const molde = EPILOGOS[chave];
   const nomeDaProva = parou?.desafio.nome ?? 'algum lugar da estrada';
   const sobreviventes = campanha.etapas

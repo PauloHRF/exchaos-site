@@ -506,6 +506,7 @@ export const NARRACAO: Record<Eixo, Record<ResultadoLance, string[]>> = {
  */
 export type ChaveEpilogo =
   | 'perfeita'
+  | 'salvou-inteiro'
   | 'salvou-com-uma-baixa'
   | 'salvou-com-baixas'
   | 'dizimada'
@@ -522,6 +523,20 @@ export const EPILOGOS: Record<ChaveEpilogo, { titulo: string; textos: string[] }
       'Contaram cinco na saída e cinco na volta. Quem já tentou sabe que a segunda contagem é a difícil.',
       'O trono está vazio e a estrada de volta tem cinco pares de pegadas. Não há muito mais a dizer, e é justamente esse o feito.',
       'Não sobrou cova nenhuma para cavar. Numa história dessas, é a parte que ninguém acredita.',
+    ],
+  },
+  /**
+   * O fim que só o modelo de despacho produz: o trono caiu e a companhia
+   * voltou inteira, mas nem toda missão foi vencida. No jogo antigo isso era
+   * impossível — falhar uma prova encerrava a jornada.
+   */
+  'salvou-inteiro': {
+    titulo: 'Todos voltaram',
+    textos: [
+      'O trono caiu e os cinco voltaram. Pelo caminho ficaram missões, não gente — e das duas coisas que se pode perder, perderam a que se recupera.',
+      'Nem toda porta se abriu, e algumas cidades vão lembrar disso. Mas quem marchou marchou de volta, e é a conta que a companhia queria fechar.',
+      'Falharam onde deu para falhar e venceram onde não dava. Cinco saíram, cinco voltaram, e o Rei Demônio não está mais sentado.',
+      'Deixaram promessas por cumprir pela estrada. Não deixaram ninguém.',
     ],
   },
   'salvou-com-uma-baixa': {
@@ -554,8 +569,8 @@ export const EPILOGOS: Record<ChaveEpilogo, { titulo: string; textos: string[] }
     titulo: 'Ao pé do trono',
     textos: [
       'Chegaram ao salão. Chegaram até a coroa descer. Foi o mais perto que alguém chegou em muito tempo, e não foi o bastante.',
-      'Seis provas atrás, e a sétima no chão do salão dele. O Rei Demônio nem precisou sair do trono para receber.',
-      'Faltavam três lances. Vão contar essa história muitas vezes, sempre parando no mesmo ponto.',
+      'Chegaram ao salão dele com o que sobrou da companhia. O Rei Demônio nem precisou levantar do trono para receber.',
+      'Faltava um passo. Vão contar essa história muitas vezes, sempre parando no mesmo ponto.',
       'A porta do salão se abriu para eles. Foi a única coisa que se abriu.',
     ],
   },

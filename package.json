@@ -8,6 +8,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "conferir": "node scripts/conferir.ts",
+    "despachar": "node scripts/despachar.ts",
     "tune": "node scripts/tune.ts",
     "normalizar": "node scripts/normalizar.ts",
     "reescalar": "node scripts/reescalar.ts"

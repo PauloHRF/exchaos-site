@@ -1,5 +1,5 @@
-import { ICONE_TIPO, ROTULO_TIPO, TATICAS } from './regras.ts';
-import type { Campanha, Recrutado, ResultadoEtapa, Tatica } from './tipos.ts';
+import { ICONE_TIPO, ROTULO_TIPO } from './regras.ts';
+import type { Campanha, Recrutado, ResultadoEtapa } from './tipos.ts';
 
 /**
  * O cartão de resultado, desenhado em canvas para virar imagem.
@@ -68,14 +68,13 @@ function caixa(ctx: CanvasRenderingContext2D, x: number, y: number, l: number, a
 export interface DadosDoCartao {
   campanha: Campanha;
   party: Recrutado[];
-  tatica: Tatica;
   numeroDoDia: number;
   titulo: string;
   remate: string;
 }
 
 export function desenharCartao(dados: DadosDoCartao): HTMLCanvasElement {
-  const { campanha, party, tatica, numeroDoDia, titulo, remate } = dados;
+  const { campanha, party, numeroDoDia, titulo, remate } = dados;
   const canvas = document.createElement('canvas');
   canvas.width = L;
   const ctx = canvas.getContext('2d')!;
@@ -199,7 +198,6 @@ export function desenharCartao(dados: DadosDoCartao): HTMLCanvasElement {
       'MORAL',
       COR.pergaminho,
     ],
-    [TATICAS[tatica].nome, 'MARCHA', COR.ouroClaro],
   ];
   const larguraCol = (L - 160) / colunas.length;
   colunas.forEach(([valor, rotulo, cor], i) => {
