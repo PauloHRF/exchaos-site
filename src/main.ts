@@ -121,30 +121,30 @@ interface Estado {
   candidatos: Candidato[];
 
   /* --- a jornada de despacho --- */
-  /** Quem ainda esta de pe. */
+  /** Quem ainda está de pé. */
   vivos: Recrutado[];
   cansaco: Cansaco;
-  /** As cargas que se gastam uma vez por jornada: amuleto, martir, teimoso. */
+  /** As cargas que se gastam uma vez por jornada: amuleto, mártir, teimoso. */
   cargas: Cargas;
-  /** Em que missao a jornada esta, de 0 a 6. */
+  /** Em que missão a jornada está, de 0 a 6. */
   missao: number;
   vitorias: number;
   falhas: number;
-  /** Quem esta marcado para ir na missao atual. */
+  /** Quem está marcado para ir na missão atual. */
   selecao: string[];
-  /** As missoes ja fechadas. */
+  /** As missões já fechadas. */
   relatos: RelatoMissao[];
-  /** A missao resolvida que esta na tela, ainda nao fechada. */
+  /** A missão resolvida que está na tela, ainda não fechada. */
   relato: RelatoMissao | null;
-  /** As bolinhas estao correndo: o desfecho ainda nao apareceu. */
+  /** As bolinhas estão correndo: o desfecho ainda não apareceu. */
   rolando: boolean;
   concluida: boolean;
-  /** Os ids de quem foi em cada missao. E o que o salvamento guarda. */
+  /** Os ids de quem foi em cada missão. É o que o salvamento guarda. */
   despachos: string[][];
 
   /**
-   * O acaso e as frases vivem no estado porque a jornada avanca clique a
-   * clique: um gerador recriado a cada missao repetiria os mesmos dados, e um
+   * O acaso e as frases vivem no estado porque a jornada avança clique a
+   * clique: um gerador recriado a cada missão repetiria os mesmos dados, e um
    * conjunto de frases recriado repetiria as mesmas linhas.
    */
   rnd: () => number;

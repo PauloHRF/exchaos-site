@@ -12,22 +12,47 @@ import type { Campanha, Recrutado, ResultadoEtapa } from './tipos.ts';
 
 const L = 1080;
 
+/**
+ * A paleta da ExChaos, espelhando os tokens do `estilo.css`.
+ *
+ * Canvas não lê variável CSS, então os valores estão repetidos aqui — e como
+ * repetição apaga, o nome de cada cor é o mesmo do token correspondente. Quando
+ * a identidade mudar, são dois arquivos, e este é o segundo.
+ *
+ * O cartão ficou de fora do commit que vestiu o jogo com a identidade e passou
+ * um tempo em sépia quente enquanto o site já era obsidiana fria — o que só
+ * aparecia quando alguém punha os dois lado a lado.
+ *
+ * **Não há verde na marca.** A vitória limpa era musgo e passou a ser arcano,
+ * que é a mesma escolha que o `estilo.css` faz em `.etapa-fecho.vitoria-limpa`.
+ */
 const COR = {
-  fundo: '#100d09',
-  papel: '#191410',
-  couro: '#2e2419',
-  bronze: '#6d5636',
-  ouro: '#c9a227',
-  ouroClaro: '#e8ca77',
-  pergaminho: '#ece3d0',
-  fraco: '#a2937a',
-  musgo: '#7fa06a',
-  ambar: '#d9a441',
-  sangue: '#c4665c',
+  /** --obsidiana */
+  fundo: '#14111c',
+  /** --marca-tinta */
+  papel: '#1e1a28',
+  /** --couro */
+  couro: '#2c2539',
+  /** --bronze */
+  bronze: '#4a3f63',
+  /** --vela */
+  ouro: '#c9962e',
+  /** --ouro-claro */
+  ouroClaro: '#e3b75c',
+  /** --marca-pergaminho */
+  pergaminho: '#e4d5b7',
+  /** --nevoa */
+  fraco: '#8b7f97',
+  /** --arcano: onde antes havia verde. */
+  arcano: '#9a6be8',
+  /** --ambar */
+  ambar: '#d4a63f',
+  /** --sangue-claro */
+  sangue: '#cf6058',
 };
 
 const COR_ETAPA: Record<ResultadoEtapa, string> = {
-  'vitoria-limpa': COR.musgo,
+  'vitoria-limpa': COR.arcano,
   'vitoria-custosa': COR.ambar,
   derrota: COR.sangue,
   'nao-jogada': COR.couro,
@@ -53,9 +78,9 @@ function texto(
 
 function filete(ctx: CanvasRenderingContext2D, y: number, x1 = 80, x2 = L - 80) {
   const g = ctx.createLinearGradient(x1, 0, x2, 0);
-  g.addColorStop(0, 'rgba(109,86,54,0)');
+  g.addColorStop(0, 'rgba(74,63,99,0)');
   g.addColorStop(0.5, COR.bronze);
-  g.addColorStop(1, 'rgba(109,86,54,0)');
+  g.addColorStop(1, 'rgba(74,63,99,0)');
   ctx.fillStyle = g;
   ctx.fillRect(x1, y, x2 - x1, 2);
 }
@@ -146,7 +171,7 @@ export function desenharCartao(dados: DadosDoCartao): HTMLCanvasElement {
   // O desfecho, em corpo grande
   texto(ctx, tituloEmCaixaAlta, L / 2, yTitulo, {
     fonte: `700 ${tamanhoTitulo}px ${SERIF}`,
-    cor: campanha.perfeita ? COR.musgo : COR.ouroClaro,
+    cor: campanha.perfeita ? COR.arcano : COR.ouroClaro,
     alinhar: 'center',
     espaco: 2,
   });
@@ -192,7 +217,7 @@ export function desenharCartao(dados: DadosDoCartao): HTMLCanvasElement {
   ctx.stroke();
   const colunas: [string, string, string][] = [
     [String(campanha.vitorias), 'PROVAS', COR.pergaminho],
-    [String(campanha.baixas), 'BAIXAS', campanha.baixas === 0 ? COR.musgo : COR.sangue],
+    [String(campanha.baixas), 'BAIXAS', campanha.baixas === 0 ? COR.arcano : COR.sangue],
     [
       (campanha.moralDaParty > 0 ? '+' : '') + (Math.round(campanha.moralDaParty * 10) / 10),
       'MORAL',
@@ -237,7 +262,7 @@ export function desenharCartao(dados: DadosDoCartao): HTMLCanvasElement {
     ctx.fillStyle = COR.papel;
     caixa(ctx, 80, y, L - 160, 80, 8);
     ctx.fill();
-    ctx.strokeStyle = caiu ? 'rgba(196,102,92,0.5)' : COR.couro;
+    ctx.strokeStyle = caiu ? 'rgba(207,96,88,0.5)' : COR.couro;
     ctx.lineWidth = 2;
     caixa(ctx, 80, y, L - 160, 80, 8);
     ctx.stroke();

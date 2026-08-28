@@ -88,7 +88,7 @@ export const TETO_DA_SOBRA = 4;
 /** Cada ponto de cansaço desconta isto de cada atributo do herói. */
 export let PESO_DO_CANSACO = 2;
 
-/** So a calibragem mexe nisto. */
+/** Só a calibragem mexe nisto. */
 export function definirPesoDoCansaco(valor: number) {
   PESO_DO_CANSACO = valor;
 }
@@ -390,11 +390,11 @@ export function contaDaMissao(
 
   const dosTracos = bonusDosTracosNaMissao(esquadrao, ctx);
   /**
-   * O que a companhia e, eixo a eixo. A tatica **nao** entra aqui: ela e
-   * postura de risco, nao capacidade, e somada a cada eixo cobrado viraria +/-12
+   * O que a companhia é, eixo a eixo. A tática **não** entra aqui: ela é
+   * postura de risco, não capacidade, e somada a cada eixo cobrado viraria ±12
    * de margem, mais do que todo o resto junto. Com ela por eixo a equilibrada
-   * salvava o mundo em 1,3% das jornadas e a defensiva em 0,0% -- e a defensiva
-   * ainda perdia mais gente que a agressiva, por perder missao demais.
+   * salvava o mundo em 1,3% das jornadas e a defensiva em 0,0% — e a defensiva
+   * ainda perdia mais gente que a agressiva, por perder missão demais.
    */
   const base = sinergiaDoEsquadrao(esquadrao).bonus + bonusMoral(desafio, moralDaParty);
 
@@ -403,9 +403,9 @@ export function contaDaMissao(
   let margemSemDado = 0;
   for (const e of cobrados) {
     somas[e] = somaDoEsquadrao(esquadrao, e, cansaco) + base + dosTracos.porEixo[e];
-    // O dado entra **antes** do teto: sorte num eixo que ja estava folgado e
-    // desperdicada. E o que faz o esquadrao bem montado ser mais previsivel que
-    // o mal montado, em vez de so mais forte.
+    // O dado entra **antes** do teto: sorte num eixo que já estava folgado é
+    // desperdiçada. É o que faz o esquadrão bem montado ser mais previsível que
+    // o mal montado, em vez de só mais forte.
     saldos[e] = Math.min(somas[e] + (dados[e] ?? 0) - exigencia[e], TETO_DA_SOBRA);
     margemSemDado += Math.min(somas[e] - exigencia[e], TETO_DA_SOBRA);
   }
@@ -555,9 +555,9 @@ export interface JornadaDespachada {
   falhas: number;
   baixas: number;
   salvou: boolean;
-  /** Venceu as sete e nao perdeu ninguem. O feito raro. */
+  /** Venceu as sete e não perdeu ninguém. O feito raro. */
   perfeita: boolean;
-  /** Salvou o mundo sem perder ninguem, mesmo tendo falhado missoes no meio. */
+  /** Salvou o mundo sem perder ninguém, mesmo tendo falhado missões no meio. */
   salvouInteiro: boolean;
   sobreviventes: Recrutado[];
 }

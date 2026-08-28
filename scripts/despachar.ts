@@ -116,7 +116,7 @@ const AMOSTRAS = 2000;
  *
  * A pergunta do jogo antigo, refeita para o novo: com o **despacho fixo** no
  * melhor que a companhia permite, quanto o draft sozinho move o resultado? Se
- * nao mover, montar os cinco virou cerimonia e so o despacho e jogo.
+ * não mover, montar os cinco virou cerimônia e só o despacho é jogo.
  */
 function medirDraft(nivel: Nivel, amostras = AMOSTRAS) {
   let salvou = 0;
