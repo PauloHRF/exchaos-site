@@ -26,37 +26,71 @@ const L = 1080;
  * **Não há verde na marca.** A vitória limpa era musgo e passou a ser arcano,
  * que é a mesma escolha que o `estilo.css` faz em `.etapa-fecho.vitoria-limpa`.
  */
-const COR = {
-  /** --obsidiana */
+/**
+ * A paleta do cartão, **lida do CSS em tempo de execução**.
+ *
+ * Canvas não entende variável CSS, mas o navegador entende: `getComputedStyle`
+ * resolve o token antes de a cor virar pixel. Assim o cartão consome a mesma
+ * definição que a tela, que vem de `assets/brand/tokens.css` pelo `estilo.css`.
+ *
+ * Antes disto a paleta era uma cópia literal, e cópia apaga: o commit que
+ * vestiu o jogo com a identidade não tocou neste arquivo, e o cartão ficou em
+ * sépia quente enquanto o site já era obsidiana. Ninguém via, porque só aparece
+ * quando os dois estão lado a lado — que é exatamente o que compartilhar faz.
+ *
+ * Os literais continuam aqui como **reserva**: se o cartão for desenhado antes
+ * de a folha de estilo valer, ou fora do navegador, ele sai na cor certa em vez
+ * de sair preto.
+ */
+const RESERVA = {
   fundo: '#14111c',
-  /** --marca-tinta */
   papel: '#1e1a28',
-  /** --couro */
   couro: '#2c2539',
-  /** --bronze */
   bronze: '#4a3f63',
-  /** --vela */
   ouro: '#c9962e',
-  /** --ouro-claro */
   ouroClaro: '#e3b75c',
-  /** --marca-pergaminho */
   pergaminho: '#e4d5b7',
-  /** --nevoa */
   fraco: '#8b7f97',
-  /** --arcano: onde antes havia verde. */
   arcano: '#9a6be8',
-  /** --ambar */
   ambar: '#d4a63f',
-  /** --sangue-claro */
   sangue: '#cf6058',
 };
 
-const COR_ETAPA: Record<ResultadoEtapa, string> = {
-  'vitoria-limpa': COR.arcano,
-  'vitoria-custosa': COR.ambar,
-  derrota: COR.sangue,
-  'nao-jogada': COR.couro,
+/** Qual token do CSS responde por cada cor do cartão. */
+const TOKEN: Record<keyof typeof RESERVA, string> = {
+  fundo: '--tinta',
+  papel: '--tinta-2',
+  couro: '--couro',
+  bronze: '--bronze',
+  ouro: '--ouro',
+  ouroClaro: '--ouro-claro',
+  pergaminho: '--pergaminho',
+  fraco: '--pergaminho-fraco',
+  arcano: '--arcano',
+  ambar: '--ambar',
+  sangue: '--sangue-claro',
 };
+
+type Paleta = typeof RESERVA;
+
+function lerPaleta(): Paleta {
+  if (typeof document === 'undefined') return RESERVA;
+  const estilo = getComputedStyle(document.documentElement);
+  const lida = { ...RESERVA };
+  for (const chave of Object.keys(RESERVA) as (keyof Paleta)[]) {
+    const valor = estilo.getPropertyValue(TOKEN[chave]).trim();
+    if (valor) lida[chave] = valor;
+  }
+  return lida;
+}
+
+const corDaEtapa = (resultado: ResultadoEtapa, COR: Paleta): string =>
+  ({
+    'vitoria-limpa': COR.arcano,
+    'vitoria-custosa': COR.ambar,
+    derrota: COR.sangue,
+    'nao-jogada': COR.couro,
+  })[resultado];
 
 const SERIF = "'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif";
 const MONO = "ui-monospace, 'Cascadia Mono', Consolas, monospace";
@@ -76,10 +110,10 @@ function texto(
   ctx.letterSpacing = '0px';
 }
 
-function filete(ctx: CanvasRenderingContext2D, y: number, x1 = 80, x2 = L - 80) {
+function filete(ctx: CanvasRenderingContext2D, cor: string, y: number, x1 = 80, x2 = L - 80) {
   const g = ctx.createLinearGradient(x1, 0, x2, 0);
   g.addColorStop(0, 'rgba(74,63,99,0)');
-  g.addColorStop(0.5, COR.bronze);
+  g.addColorStop(0.5, cor);
   g.addColorStop(1, 'rgba(74,63,99,0)');
   ctx.fillStyle = g;
   ctx.fillRect(x1, y, x2 - x1, 2);
@@ -100,6 +134,7 @@ export interface DadosDoCartao {
 
 export function desenharCartao(dados: DadosDoCartao): HTMLCanvasElement {
   const { campanha, party, numeroDoDia, titulo, remate } = dados;
+  const COR = lerPaleta();
   const canvas = document.createElement('canvas');
   canvas.width = L;
   const ctx = canvas.getContext('2d')!;
@@ -166,7 +201,7 @@ export function desenharCartao(dados: DadosDoCartao): HTMLCanvasElement {
     cor: COR.fraco,
     alinhar: 'right',
   });
-  filete(ctx, 162);
+  filete(ctx, COR.bronze, 162);
 
   // O desfecho, em corpo grande
   texto(ctx, tituloEmCaixaAlta, L / 2, yTitulo, {
@@ -187,7 +222,7 @@ export function desenharCartao(dados: DadosDoCartao): HTMLCanvasElement {
   const totalProvas = campanha.etapas.length * larguraProva + (campanha.etapas.length - 1) * vaoProva;
   let px = (L - totalProvas) / 2;
   campanha.etapas.forEach((etapa, i) => {
-    const cor = COR_ETAPA[etapa.resultado];
+    const cor = corDaEtapa(etapa.resultado, COR);
     ctx.fillStyle = 'rgba(25,20,16,0.9)';
     caixa(ctx, px, topoProvas, larguraProva, 104, 8);
     ctx.fill();
@@ -287,7 +322,7 @@ export function desenharCartao(dados: DadosDoCartao): HTMLCanvasElement {
   });
 
   // Rodapé
-  filete(ctx, rodape);
+  filete(ctx, COR.bronze, rodape);
   texto(ctx, 'exchaos.com.br/jogos/ate-o-trono · monte a sua', L / 2, rodape + 48, {
     fonte: `24px ${MONO}`,
     cor: COR.fraco,

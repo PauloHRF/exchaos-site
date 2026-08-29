@@ -1,16 +1,5 @@
-/* ExChaos — sistema de identidade (tokens + base compartilhada) */
-@import url('https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@400;500;600;700&family=Spectral:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap');
-
-:root{
-  --obsidian:#14111C; --obsidian-deep:#0C0A12; --ink:#1E1A28; --ink-2:#26202F;
-  --parchment:#E4D5B7; --parchment-dim:#B9A987;
-  --arcane:#9A6BE8; --arcane-deep:#6E49B0; --candle:#C9962E; --oxblood:#8A2B2B;
-  --muted:#8B7F97; --line:#332B42;
-  --fd:'Grenze Gotisch','Trajan Pro',serif;
-  --fb:'Spectral',Georgia,serif;
-  --fm:'IBM Plex Mono',ui-monospace,SFMono-Regular,monospace;
-}
-
+/* ExChaos — os componentes base do portal. As cores vêm de tokens.css. */
+@import url('./tokens.css');
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%}
 body{

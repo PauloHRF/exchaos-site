@@ -81,9 +81,31 @@ num subcaminho (`/jogos/<slug>/`) e precisa funcionar de lá. No Até o Trono is
 
 ## Marca
 
-Cores, fontes e componentes ficam em `assets/brand/exchaos.css`. O guia de
-estilo completo está no pacote da marca, fora deste repositório.
+**`assets/brand/tokens.css` é a definição canônica.** É o único lugar do
+repositório onde uma cor ou fonte da identidade tem valor literal. Mudar a
+identidade é mexer nesse arquivo, e mais nenhum.
 
-Os jogos com build carregam a própria cópia dos tokens — o Até o Trono os tem no
-`src/estilo.css` e de novo no `src/cartao.ts`, porque canvas não lê variável
-CSS. Ao mudar a identidade, são esses lugares.
+Quem consome:
+
+- **`assets/brand/exchaos.css`** — junta aos tokens os componentes base do
+  portal (`body`, `.btn`, `.wrap`, `.seal`). É o que as páginas do portal
+  importam.
+- **`jogos/ate-o-trono/src/estilo.css`** — importa os tokens por caminho
+  relativo e os apelida para os nomes em português que o jogo usa, derivando os
+  tons que só ele precisa. Não define nenhuma cor da marca.
+- **`jogos/ate-o-trono/src/cartao.ts`** — canvas não entende variável CSS, mas
+  o navegador entende: o cartão lê os tokens com `getComputedStyle` na hora de
+  desenhar. Os literais continuam lá como reserva, para o cartão não sair preto
+  se for desenhado antes de a folha de estilo valer.
+
+Isso existe porque a identidade já esteve em três cópias, e cópia apaga: o
+commit que vestiu o jogo com a marca não tocou no cartão, que passou semanas em
+sépia quente enquanto o site já era obsidiana — algo que só aparece quando os
+dois estão lado a lado, que é exatamente o que compartilhar faz.
+
+**As fontes não são compartilhadas**, de propósito. Os tokens do portal
+(`--fd`, `--fb`, `--fm`) já terminam em `serif`/`monospace`, então encaixá-los
+numa pilha maior mata tudo o que vem depois. O nome da família é o da marca; a
+pilha de reserva é decisão de cada consumidor.
+
+O guia de estilo completo está no pacote da marca, fora deste repositório.

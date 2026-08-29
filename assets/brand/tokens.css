@@ -1,0 +1,28 @@
+/*
+ * ExChaos — os tokens da marca. **A definição canônica.**
+ *
+ * Este arquivo é o único lugar onde uma cor ou fonte da identidade tem valor
+ * literal. Quem consome:
+ *
+ *   - `exchaos.css`, que junta a estes os componentes base do portal;
+ *   - o `src/estilo.css` de cada jogo com build, que apelida estes nomes para
+ *     os seus e deriva os tons que só ele usa;
+ *   - o `src/cartao.ts` do Até o Trono, que os lê em tempo de execução com
+ *     `getComputedStyle` — canvas não entende variável CSS, mas o navegador a
+ *     resolve antes.
+ *
+ * Foi separado quando a identidade já existia em três cópias, e uma delas ficou
+ * para trás: o cartão passou semanas em sépia quente enquanto o site já era
+ * obsidiana.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@400;500;600;700&family=Spectral:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root{
+  --obsidian:#14111C; --obsidian-deep:#0C0A12; --ink:#1E1A28; --ink-2:#26202F;
+  --parchment:#E4D5B7; --parchment-dim:#B9A987;
+  --arcane:#9A6BE8; --arcane-deep:#6E49B0; --candle:#C9962E; --oxblood:#8A2B2B;
+  --muted:#8B7F97; --line:#332B42;
+  --fd:'Grenze Gotisch','Trajan Pro',serif;
+  --fb:'Spectral',Georgia,serif;
+  --fm:'IBM Plex Mono',ui-monospace,SFMono-Regular,monospace;
+}

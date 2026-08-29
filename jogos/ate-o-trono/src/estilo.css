@@ -11,18 +11,33 @@
  * lado, o que muda a cada clique do outro.
  */
 
+@import '../../../assets/brand/tokens.css';
+
 :root {
   /*
-   * Paleta ExChaos (guia v1). As sete cores da marca vêm primeiro, com o nome
-   * que o guia usa — é por elas que se confere se o site saiu da identidade.
+   * As sete cores da marca **não são definidas aqui**. Vêm do
+   * `assets/brand/tokens.css` do monorepo, que é a definição canônica, e esta
+   * seção só as apelida para os nomes em português que as mil e trezentas
+   * linhas abaixo usam.
+   *
+   * O apelido existe porque renomear tudo para os nomes do portal seria um
+   * diff enorme sem ganho: o que causava estrago era a cor repetida, não o
+   * nome traduzido. Com isto, mudar a identidade é mexer num arquivo.
+   *
+   * **As fontes ficaram de fora**, de propósito. Os tokens do portal (`--fd`,
+   * `--fb`, `--fm`) já trazem a pilha de reserva deles e terminam em `serif` ou
+   * `monospace`; encaixá-los aqui punha um `serif` no meio da pilha e matava
+   * tudo o que vinha depois. Aqui as reservas são escolhidas para o texto
+   * continuar legível enquanto a fonte da marca carrega, e essa é decisão do
+   * jogo, não da identidade. O nome da família continua sendo o da marca.
    */
-  --obsidiana: #14111c;
-  --marca-tinta: #1e1a28;
-  --marca-pergaminho: #e4d5b7;
-  --arcano: #9a6be8;
-  --vela: #c9962e;
-  --marca-sangue: #8a2b2b;
-  --nevoa: #8b7f97;
+  --obsidiana: var(--obsidian);
+  --marca-tinta: var(--ink);
+  --marca-pergaminho: var(--parchment);
+  --arcano: var(--arcane);
+  --vela: var(--candle);
+  --marca-sangue: var(--oxblood);
+  --nevoa: var(--muted);
 
   /*
    * Os tokens do jogo, agora servidos pela paleta acima. Os nomes ficaram: são
