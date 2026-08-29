@@ -1,0 +1,27 @@
+{
+  // O site é publicado como um Worker de arquivos estáticos, não como projeto
+  // do Cloudflare Pages. É por isso que o painel não tem "Build output
+  // directory": em Workers, a pasta a publicar é declarada aqui, e o
+  // `npx wrangler deploy` do painel lê este arquivo.
+  //
+  // Não há `main`: é um Worker só de assets, sem código de servidor. O site é
+  // estático e continua sendo — o build só existe porque há jogo com cadeia de
+  // build própria.
+  "$schema": "node_modules/wrangler/config-schema.json",
+
+  // Precisa bater com o nome do Worker no painel. Se divergir, o deploy cria
+  // um Worker novo em vez de atualizar o que já está no ar.
+  "name": "exchaos-site",
+
+  "compatibility_date": "2026-08-29",
+
+  "assets": {
+    // A saída do `npm run build`: o site estático já com os jogos construídos
+    // dentro de `jogos/<slug>/`.
+    "directory": "./dist",
+
+    // Caminho que não existe cai no 404.html da raiz, no tema do site, em vez
+    // da página de erro genérica da Cloudflare.
+    "not_found_handling": "404-page"
+  }
+}
