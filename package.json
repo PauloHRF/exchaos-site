@@ -1,0 +1,13 @@
+{
+  "name": "exchaos-site",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "workspaces": [
+    "jogos/ate-o-trono"
+  ],
+  "scripts": {
+    "build": "node scripts/construir.mjs",
+    "preview": "npm run build && npx serve dist"
+  }
+}

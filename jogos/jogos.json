@@ -1,9 +1,22 @@
 [
   {
+    "slug": "ate-o-trono",
+    "titulo": "Até o Trono",
+    "descricao": "Recrute cinco heróis de todas as eras e despache esquadrões contra sete missões. O difícil não é vencer uma — é ainda ter gente de pé na última.",
+    "status": "no-ar",
+    "tags": [
+      "RPG",
+      "diário",
+      "estratégia"
+    ]
+  },
+  {
     "slug": "exemplo",
     "titulo": "Exemplo",
-    "descricao": "Um placeholder pra mostrar a estrutura. Troque pela pasta do seu primeiro jogo e edite esta entrada.",
+    "descricao": "Um placeholder pra mostrar a estrutura. Duplique esta pasta para começar um jogo novo.",
     "status": "em-breve",
-    "tags": ["placeholder"]
+    "tags": [
+      "placeholder"
+    ]
   }
 ]
