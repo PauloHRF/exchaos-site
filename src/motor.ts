@@ -593,7 +593,7 @@ export function textoDeCompartilhamento(campanha: Campanha, numeroDoDia: number)
         : 'O trono caiu, e paguei caro por isso.'
       : 'A estrada acabou antes do trono.';
 
-  return `Até o Trono #${numeroDoDia}\n${grade}\n${selo(campanha.moralDaParty)} · ${remate}\nateotrono.com.br`;
+  return `Até o Trono #${numeroDoDia}\n${grade}\n${selo(campanha.moralDaParty)} · ${remate}\nexchaos.com.br/jogos/ate-o-trono`;
 }
 
 export { TAMANHO_PARTY };

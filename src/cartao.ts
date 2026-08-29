@@ -288,7 +288,7 @@ export function desenharCartao(dados: DadosDoCartao): HTMLCanvasElement {
 
   // Rodapé
   filete(ctx, rodape);
-  texto(ctx, 'ateotrono.com.br · monte a sua', L / 2, rodape + 48, {
+  texto(ctx, 'exchaos.com.br/jogos/ate-o-trono · monte a sua', L / 2, rodape + 48, {
     fonte: `24px ${MONO}`,
     cor: COR.fraco,
     alinhar: 'center',

@@ -158,6 +158,11 @@ let treinoPendente = false;
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 const escapar = (t: string) => t.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
+/**
+ * A chave do salvamento continua com o nome antigo de propósito: é
+ * identificador interno, não endereço. Trocá-la faria toda jornada já guardada
+ * sumir sem ganho nenhum.
+ */
 const chaveSalva = (dia: string) => `ateotrono:${dia}`;
 const sinalMoral = (m: number) => (m > 0 ? `+${m}` : `${m}`);
 const comSinal = (n: number) => (n >= 0 ? `+${n}` : `${n}`);
