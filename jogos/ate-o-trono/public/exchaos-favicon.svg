@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="ExChaos">
+  <defs>
+    <g id="fav-arrow">
+      <path d="M100,82 L100,44" fill="none" stroke="#E4D5B7" stroke-width="13" stroke-linecap="round"/>
+      <path d="M100,29 L112,49 L88,49 Z" fill="#E4D5B7"/>
+    </g>
+  </defs>
+  <rect x="8" y="8" width="184" height="184" rx="42" fill="#14111C"/>
+  <rect x="9.5" y="9.5" width="181" height="181" rx="40.5" fill="none" stroke="#9A6BE8" stroke-width="3" opacity="0.6"/>
+  <use href="#fav-arrow" transform="rotate(0 100 100)"/>
+  <use href="#fav-arrow" transform="rotate(45 100 100)"/>
+  <use href="#fav-arrow" transform="rotate(90 100 100)"/>
+  <use href="#fav-arrow" transform="rotate(135 100 100)"/>
+  <use href="#fav-arrow" transform="rotate(180 100 100)"/>
+  <use href="#fav-arrow" transform="rotate(225 100 100)"/>
+  <use href="#fav-arrow" transform="rotate(270 100 100)"/>
+  <use href="#fav-arrow" transform="rotate(315 100 100)"/>
+  <circle cx="100" cy="100" r="7" fill="#C9962E"/>
+</svg>

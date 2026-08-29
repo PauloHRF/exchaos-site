@@ -1,0 +1,24 @@
+{
+  "name": "ate-o-trono",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "conferir": "node scripts/conferir.ts",
+    "despachar": "node scripts/despachar.ts",
+    "tune": "node scripts/tune.ts",
+    "normalizar": "node scripts/normalizar.ts",
+    "reescalar": "node scripts/reescalar.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
+  }
+}

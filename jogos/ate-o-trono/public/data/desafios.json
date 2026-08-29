@@ -1,0 +1,230 @@
+{
+  "versao": 3,
+  "desafios": [
+    {
+      "id": "vila",
+      "nome": "A Vila em Chamas",
+      "tipo": "combate",
+      "abertura": "A fumaça é vista da estrada. Quando vocês chegam, metade já não dá para salvar.",
+      "lances": [
+        { "cena": "As primeiras casas caíram, e o calor da praça não deixa ninguém respirar.", "eixo": "vigor", "dificuldade": 29 },
+        { "cena": "Alguém precisa tirar as crianças do celeiro antes de o fogo chegar lá.", "eixo": "mobilidade", "dificuldade": 27 },
+        { "cena": "O chefe da horda para no meio da praça e chama duelo.", "eixo": "combate", "dificuldade": 31 }
+      ]
+    },
+    {
+      "id": "wyrm",
+      "nome": "O Desfiladeiro do Wyrm",
+      "tipo": "combate",
+      "abertura": "Não há desvio. O desfiladeiro é o caminho, e ele tem dono há quatrocentos anos.",
+      "lances": [
+        { "cena": "A garganta é estreita, e a fera já sabe que vocês vieram.", "eixo": "intelecto", "dificuldade": 28 },
+        { "cena": "Escamas de dois palmos. Alguém precisa achar a junta.", "eixo": "combate", "dificuldade": 33 },
+        { "cena": "O desfiladeiro começa a desabar em cima de todo mundo.", "eixo": "mobilidade", "dificuldade": 30 }
+      ]
+    },
+    {
+      "id": "criptas",
+      "nome": "As Criptas de Vhal",
+      "tipo": "combate",
+      "abertura": "Enterraram fundo por um motivo. O motivo continua lá embaixo.",
+      "favorece": "luz",
+      "lances": [
+        { "cena": "O que está enterrado aqui não fica quieto quando alguém desce.", "eixo": "carisma", "dificuldade": 31 },
+        { "cena": "Os corredores se fecham, e algo respira logo atrás.", "eixo": "combate", "dificuldade": 29 },
+        { "cena": "O ar lá embaixo é velho e pesado, e vai cobrando a cada corredor.", "eixo": "vigor", "dificuldade": 32 }
+      ]
+    },
+    {
+      "id": "fortaleza",
+      "nome": "Cerco à Fortaleza Negra",
+      "tipo": "combate",
+      "abertura": "Doze metros de muralha, um mês de mantimentos lá dentro e nenhum aríete aqui fora.",
+      "lances": [
+        { "cena": "Precisa achar por onde entrar sem ser pela frente.", "eixo": "intelecto", "dificuldade": 30 },
+        { "cena": "O portão cede, e o pátio inteiro vem junto.", "eixo": "combate", "dificuldade": 33 },
+        { "cena": "Fogo grego nas escadas, e a subida é longa demais para parar no meio.", "eixo": "vigor", "dificuldade": 29 }
+      ]
+    },
+    {
+      "id": "besta",
+      "nome": "A Caçada da Besta Lunar",
+      "tipo": "combate",
+      "abertura": "Faz três noites que ela caça vocês. Hoje decidiram inverter os papéis.",
+      "lances": [
+        { "cena": "Ela caçou vocês primeiro, e fez isso muito bem.", "eixo": "intelecto", "dificuldade": 31 },
+        { "cena": "A fera aparece exatamente onde ninguém apontou a arma.", "eixo": "combate", "dificuldade": 33 },
+        { "cena": "Ferida, ela corre. Alguém tem que correr mais.", "eixo": "mobilidade", "dificuldade": 31 }
+      ]
+    },
+    {
+      "id": "estandartes",
+      "nome": "O Exército dos Mil Estandartes",
+      "tipo": "combate",
+      "abertura": "Mil homens no vale, cinco no morro. A conta não fecha de jeito nenhum.",
+      "lances": [
+        { "cena": "Dá para fazer mil homens hesitarem, se a voz certa falar.", "eixo": "carisma", "dificuldade": 31 },
+        { "cena": "A linha de frente encosta, e não há para onde recuar.", "eixo": "combate", "dificuldade": 34 },
+        { "cena": "A retirada precisa ser coberta, e quem cobrir vai aguentar sozinho.", "eixo": "vigor", "dificuldade": 32 }
+      ]
+    },
+    {
+      "id": "corte",
+      "nome": "A Corte do Rei Enfermo",
+      "tipo": "negociacao",
+      "abertura": "O rei ainda decide. O problema é quem decide o que chega até ele.",
+      "lances": [
+        { "cena": "O rei ouve, mas o conselheiro fala mais alto e há mais tempo.", "eixo": "carisma", "dificuldade": 30 },
+        { "cena": "Tem uma mentira no documento, e ele precisa ser assinado hoje.", "eixo": "intelecto", "dificuldade": 31 },
+        { "cena": "A corte exige uma prova de fé, na frente de todos.", "eixo": "carisma", "dificuldade": 29 }
+      ]
+    },
+    {
+      "id": "senhor-guerra",
+      "nome": "O Preço do Senhor da Guerra",
+      "tipo": "negociacao",
+      "abertura": "Ele tem os soldados que faltam. E o preço nunca é dinheiro.",
+      "favorece": "trevas",
+      "lances": [
+        { "cena": "Ele quer saber o que vocês já fizeram, não o que pretendem fazer.", "eixo": "carisma", "dificuldade": 31 },
+        { "cena": "O acordo pede um refém, e a armadilha está no meio das linhas.", "eixo": "intelecto", "dificuldade": 30 },
+        { "cena": "A escolta dele testa, na marra, se vocês estão blefando.", "eixo": "combate", "dificuldade": 28 }
+      ]
+    },
+    {
+      "id": "conclave",
+      "nome": "O Conclave dos Magos",
+      "tipo": "negociacao",
+      "abertura": "Sete cadeiras, sete votos, e nenhuma vaga para quem chega pedindo.",
+      "lances": [
+        { "cena": "Ninguém aqui cede a palavra para quem não impõe respeito.", "eixo": "carisma", "dificuldade": 31 },
+        { "cena": "O conclave só ouve quem ficar de pé dentro do círculo até o fim.", "eixo": "vigor", "dificuldade": 33 },
+        { "cena": "Recusar o convite deles sai mais caro do que aceitar.", "eixo": "carisma", "dificuldade": 31 }
+      ]
+    },
+    {
+      "id": "ladroes",
+      "nome": "A Guilda dos Ladrões",
+      "tipo": "negociacao",
+      "abertura": "O mapa que falta está com quem não vende mapa para gente honesta.",
+      "favorece": "trevas",
+      "lances": [
+        { "cena": "Aqui ninguém abre a porta para quem parece limpo demais.", "eixo": "carisma", "dificuldade": 29 },
+        { "cena": "O mapa está com quem não pretende entregá-lo.", "eixo": "intelecto", "dificuldade": 32 },
+        { "cena": "A saída é pelos telhados, e a cidade inteira acordou.", "eixo": "mobilidade", "dificuldade": 28 }
+      ]
+    },
+    {
+      "id": "espelhos",
+      "nome": "O Labirinto de Espelhos",
+      "tipo": "enigma",
+      "abertura": "Nenhum inimigo à vista. É exatamente esse o problema.",
+      "lances": [
+        { "cena": "Cada corredor devolve a imagem de vocês entrando por outro.", "eixo": "intelecto", "dificuldade": 31 },
+        { "cena": "O caminho certo parece errado três vezes seguidas.", "eixo": "intelecto", "dificuldade": 33 },
+        { "cena": "O labirinto mostra a cada um exatamente o que ele mais teme.", "eixo": "carisma", "dificuldade": 31 }
+      ]
+    },
+    {
+      "id": "biblioteca",
+      "nome": "A Biblioteca Afundada",
+      "tipo": "enigma",
+      "abertura": "A resposta está escrita. Está só doze metros abaixo da linha d'água.",
+      "lances": [
+        { "cena": "A inscrição está numa língua que morreu duas vezes.", "eixo": "intelecto", "dificuldade": 32 },
+        { "cena": "A água sobe enquanto vocês leem.", "eixo": "vigor", "dificuldade": 30 },
+        { "cena": "O livro certo está no fundo, e o fundo está longe.", "eixo": "mobilidade", "dificuldade": 31 }
+      ]
+    },
+    {
+      "id": "traidor",
+      "nome": "O Traidor no Acampamento",
+      "tipo": "enigma",
+      "abertura": "Cem homens dormindo, e um deles manda notícias para o outro lado.",
+      "lances": [
+        { "cena": "Um dos cem serve ao inimigo, e parte ao amanhecer.", "eixo": "intelecto", "dificuldade": 33 },
+        { "cena": "Acusar a pessoa errada quebra o acampamento inteiro.", "eixo": "carisma", "dificuldade": 31 },
+        { "cena": "Ele corre no instante em que percebe que foi visto.", "eixo": "mobilidade", "dificuldade": 28 }
+      ]
+    },
+    {
+      "id": "porta",
+      "nome": "A Porta Sem Fechadura",
+      "tipo": "enigma",
+      "abertura": "Sem tranca, sem dobradiça, sem chave. E fechada há mil anos.",
+      "favorece": "luz",
+      "lances": [
+        { "cena": "Não tem tranca, não tem dobradiça, não tem por onde começar.", "eixo": "intelecto", "dificuldade": 33 },
+        { "cena": "A porta pergunta o nome de quem bate.", "eixo": "carisma", "dificuldade": 32 },
+        { "cena": "A porta cede um palmo, e não vai ceder de novo.", "eixo": "mobilidade", "dificuldade": 29 }
+      ]
+    },
+    {
+      "id": "inverno",
+      "nome": "O Passo do Inverno Longo",
+      "tipo": "travessia",
+      "abertura": "A trilha existe em algum lugar debaixo de três dias de neve.",
+      "lances": [
+        { "cena": "Três dias de neve fecharam qualquer coisa parecida com trilha.", "eixo": "vigor", "dificuldade": 31 },
+        { "cena": "Precisa chegar ao abrigo antes de escurecer, e escurece cedo.", "eixo": "mobilidade", "dificuldade": 30 },
+        { "cena": "O último trecho é subida, e a corda acabou antes.", "eixo": "mobilidade", "dificuldade": 30 }
+      ]
+    },
+    {
+      "id": "areia",
+      "nome": "O Mar de Areia",
+      "tipo": "travessia",
+      "abertura": "Quinze dias de deserto com água para dez. A caravana garantiu que dava.",
+      "lances": [
+        { "cena": "A água acaba antes da metade do caminho.", "eixo": "vigor", "dificuldade": 32 },
+        { "cena": "A caravana some durante a noite, e leva o rumo junto.", "eixo": "intelecto", "dificuldade": 31 },
+        { "cena": "A areia se mexe, e dessa vez não é o vento. Quem parar, afunda.", "eixo": "mobilidade", "dificuldade": 29 }
+      ]
+    },
+    {
+      "id": "rio",
+      "nome": "O Rio dos Afogados",
+      "tipo": "travessia",
+      "abertura": "Todo mundo na região sabe o nome do rio. Ninguém explica de onde veio.",
+      "favorece": "luz",
+      "lances": [
+        { "cena": "A balsa não aguenta cinco, e não há segunda viagem.", "eixo": "intelecto", "dificuldade": 30 },
+        { "cena": "O rio chama cada um pelo nome, e acerta todos.", "eixo": "carisma", "dificuldade": 33 },
+        { "cena": "A margem oposta está bem mais longe do que parecia.", "eixo": "vigor", "dificuldade": 31 }
+      ]
+    },
+    {
+      "id": "fome",
+      "nome": "A Marcha da Fome",
+      "tipo": "travessia",
+      "abertura": "Comida para dois dias, caminho para cinco, e nenhuma aldeia disposta a abrir a porta.",
+      "lances": [
+        { "cena": "Comida para dois dias e estrada para cinco.", "eixo": "vigor", "dificuldade": 33 },
+        { "cena": "As aldeias do caminho trancam tudo quando vocês aparecem.", "eixo": "carisma", "dificuldade": 30 },
+        { "cena": "Alguém vai ter que aguentar calado para os outros comerem.", "eixo": "vigor", "dificuldade": 30 }
+      ]
+    },
+    {
+      "id": "trono-sentado",
+      "nome": "O Trono do Rei Demônio",
+      "tipo": "trono",
+      "abertura": "Ele esperou sete eras sentado. Não vai levantar por qualquer um que entre.",
+      "lances": [
+        { "cena": "Ele oferece o mundo para quem largar a espada agora, e a oferta tem fundo falso.", "eixo": "intelecto", "dificuldade": 34 },
+        { "cena": "O salão inteiro é dele, inclusive o chão sob os pés de vocês.", "eixo": "mobilidade", "dificuldade": 35 },
+        { "cena": "A coroa desce, e o primeiro golpe já é para matar.", "eixo": "combate", "dificuldade": 36 }
+      ]
+    },
+    {
+      "id": "trono-desperto",
+      "nome": "O Rei Demônio Desperto",
+      "tipo": "trono",
+      "abertura": "Ele estava de pé quando vocês entraram. Já sabia os nomes de todos.",
+      "lances": [
+        { "cena": "Ele diz o nome de cada um, na ordem em que pretende matá-los.", "eixo": "carisma", "dificuldade": 34 },
+        { "cena": "Ele muda de forma no instante em que entende que pode perder.", "eixo": "combate", "dificuldade": 36 },
+        { "cena": "Sobrou um golpe, e quem for dá-lo precisa chegar de pé até ele.", "eixo": "vigor", "dificuldade": 35 }
+      ]
+    }
+  ]
+}
