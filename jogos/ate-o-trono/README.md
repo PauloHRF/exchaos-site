@@ -212,12 +212,42 @@ Três armadilhas encontradas no caminho, todas por medição:
   dentro do simulador, e a interface, que tem o seu próprio laço, rodava sem
   ela: sete fracassos graves e a companhia voltava inteira.
 
-`npm run conferir` faz 33 checagens do roster e do catálogo: integridade,
-determinismo, traços válidos e usados, que nenhum draft fique sem candidato
-compatível, e que **todo eixo seja cobrado entre 3,5 e 5 vezes por dia** —
-contando pelo dia e não pelo catálogo, porque a jornada sorteia três combates e
-só um de cada uma das outras provas, e um eixo cobrado quatro vezes menos que
-outro não é atributo, é lugar de jogar fora os pontos que sobram.
+`npm run conferir` faz 41 checagens e é o que guarda o desenho contra
+regressão. As de elenco e catálogo continuam iguais — integridade, traços
+válidos e usados, que nenhum draft fique sem candidato compatível, e que **todo
+eixo seja cobrado entre 3,5 e 5 vezes por dia**, contando pelo dia e não pelo
+catálogo, porque a jornada sorteia três combates e só um de cada uma das outras
+provas.
+
+As que guardam o modelo de despacho:
+
+- **Despachar bem paga o dobro de despachar no impulso** (`zeloso` × `bruto`).
+  É a que falha quando o jogo continua funcionando e deixa de ser jogo: se
+  mandar o esquadrão certo e mandar os três mais fortes dão no mesmo, as seis
+  decisões de despacho são cerimônia.
+- **Recrutar bem paga o dobro de recrutar mal**, com o despacho fixo para as
+  duas decisões não se embolarem.
+- **O cansaço é medido desligando-o.** Com ele valendo, guardar gente tem de
+  vencer queimar o time A; com ele em zero, a ordem tem de **inverter**. Se as
+  duas medidas apontassem para o mesmo lado, o cansaço seria enfeite — o jogo
+  continuaria rodando e a mecânica que o distingue teria morrido sem ninguém
+  ver.
+- **A calibragem, num intervalo largo:** o bom jogador salva o mundo entre 15% e
+  45% das jornadas. As razões acima medem *distância* entre jogar bem e mal, e
+  distância sobrevive a mudanças de dificuldade — dá para o jogo inteiro ficar
+  fácil demais com as proporções intactas. O intervalo não existe para fixar o
+  número; existe para uma mudança que mexe na dificuldade em silêncio ter de ser
+  reconhecida por quem a fez.
+- **A margem é a soma exata dos saldos**, que é o que a interface mostra. Se
+  pararem de fechar, o jogador vê uma conta que não bate e a regra do teto da
+  sobra vira mágica.
+- Mais o feijão com arroz: determinismo, um dado por eixo cobrado entre −4 e +4,
+  só quem foi despachado pode cair, quem cai é o protagonista ou o Mártir no
+  lugar dele, e nenhum eixo pede mais do que o esquadrão daquela missão consegue
+  pôr — teto de três heróis nas comuns, de cinco no trono.
+
+As checagens foram testadas contra sabotagem: desligar o cansaço derruba três
+delas, afrouxar a dificuldade derruba outras três.
 
 ## Trocar o conteúdo
 
@@ -259,5 +289,8 @@ scripts/conferir.ts   as checagens do roster e do catálogo
 scripts/avaliar.ts    quanto vale uma companhia para quem não sabe o que o dia cobra
 ```
 
-`src/motor.ts` ainda carrega a simulação lance a lance do modelo anterior, que
-`scripts/conferir.ts` usa nas checagens de roster e determinismo.
+`src/motor.ts` ainda carrega `simularCampanha`, a simulação lance a lance do
+modelo anterior. Hoje só o `scripts/tune.ts` a usa — o `conferir.ts` foi migrado
+para o motor de despacho, porque checagem que testa um motor aposentado passa
+verde enquanto o jogo publicado pode estar quebrado. Os dois são candidatos a
+remoção quando ninguém mais quiser consultar a calibragem antiga.
