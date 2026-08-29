@@ -1,21 +1,16 @@
 import { embaralhar, hash, mulberry32 } from './rng.ts';
 import {
-  BONUS_POR_CAIDO,
+  CANDIDATOS_POR_RODADA,
   COMPOSICAO_DA_JORNADA,
   DEGRAU_DA_ETAPA,
   EIXOS,
   EPILOGOS,
-  MARGEM_BRILHANTE,
-  NARRACAO,
-  PESO_MORAL_NO_DESAFIO,
   ROTULO_ETIQUETA,
   SELO_DO_EPILOGO,
   SINERGIA,
   TAMANHO_PARTY,
-  TATICAS,
   TOLERANCIA_MORAL,
   TRACOS,
-  rolarDado,
   type ChaveEpilogo,
 } from './regras.ts';
 import type {
@@ -27,11 +22,7 @@ import type {
   Heroi,
   Recrutado,
   Recusa,
-  RelatoEtapa,
-  RelatoLance,
   ResultadoEtapa,
-  ResultadoLance,
-  Tatica,
 } from './tipos.ts';
 
 export function comoRecrutado(heroi: Heroi, guilda: { id: string; nome: string }): Recrutado {
@@ -158,7 +149,7 @@ export function sortearCandidatos(
   }
 
   return embaralhar(rnd, disponiveis)
-    .slice(0, 4)
+    .slice(0, CANDIDATOS_POR_RODADA)
     .map(({ guilda, herois }) => {
       const heroi = comoRecrutado(escolherDe(rnd, herois), guilda);
       return { heroi, recusa: avaliarRecusa(heroi, jaRecrutados) };
@@ -186,7 +177,7 @@ export function jornadaDoDia(catalogo: CatalogoDesafios, dia: string): Desafio[]
   });
 }
 
-export function dificuldadeDoLance(base: number, etapa: number): number {
+function dificuldadeDoLance(base: number, etapa: number): number {
   return base + DEGRAU_DA_ETAPA[etapa];
 }
 
@@ -245,253 +236,6 @@ export function moralDaParty(party: Recrutado[]): number {
   return party.reduce((s, h) => s + h.moral, 0) / party.length;
 }
 
-/* ---------------------------------------------------------------- resolução */
-
-/**
- * Quem a narração acompanha. O atributo dele não entra na conta — o grupo é
- * que resolve —, mas quem se destaca no eixo tende a ser quem aparece, e quem
- * acabou de agir aparece menos, para um nome só não roubar a etapa.
- */
-function sortearProtagonista(
-  rnd: () => number,
-  vivos: Recrutado[],
-  eixo: Eixo,
-  anterior: Recrutado | null,
-): Recrutado {
-  const pesos = vivos.map(
-    (h) => Math.pow(Math.max(h[eixo], 1), 2) * (h.id === anterior?.id ? 0.3 : 1),
-  );
-  const total = pesos.reduce((a, b) => a + b, 0);
-  let alvo = rnd() * total;
-  for (let i = 0; i < vivos.length; i++) {
-    alvo -= pesos[i];
-    if (alvo <= 0) return vivos[i];
-  }
-  return vivos[vivos.length - 1];
-}
-
-/**
- * O que os traços da companhia somam neste lance. Só conta quem está vivo — o
- * traço vai embora com o herói, e é por isso que perder gente cedo dói além da
- * soma de atributos.
- */
-export function bonusDosTracos(
-  vivos: Recrutado[],
-  contexto: {
-    eixo: Eixo;
-    prova: Desafio['tipo'];
-    numeroDoLance: number;
-    totalDeLances: number;
-    houveBaixa: boolean;
-  },
-): { valor: number; nomes: string[] } {
-  let valor = 0;
-  const nomes: string[] = [];
-
-  for (const heroi of vivos) {
-    const traco = TRACOS[heroi.traco];
-    const e = traco.efeito;
-    let soma = 0;
-
-    if (e.tipo === 'sempre') soma = e.valor;
-    else if (e.tipo === 'eixo' && e.eixo === contexto.eixo) soma = e.valor;
-    else if (e.tipo === 'prova' && e.prova === contexto.prova) soma = e.valor;
-    else if (e.tipo === 'primeiro-lance' && contexto.numeroDoLance === 1) soma = e.valor;
-    else if (e.tipo === 'ultimo-lance' && contexto.numeroDoLance === contexto.totalDeLances) {
-      soma = e.valor;
-    } else if (e.tipo === 'apos-baixa' && contexto.houveBaixa) soma = e.valor;
-
-    if (soma !== 0) {
-      valor += soma;
-      nomes.push(traco.nome);
-    }
-  }
-
-  return { valor, nomes };
-}
-
-function bonusMoral(desafio: Desafio, media: number): number {
-  if (!desafio.favorece) return 0;
-  const sinal = desafio.favorece === 'trevas' ? -1 : 1;
-  return Math.round(PESO_MORAL_NO_DESAFIO * sinal * media);
-}
-
-/**
- * A vitória custosa é o fracasso crítico: o lance é vencido, e mesmo assim
- * alguém fica pelo caminho porque o dado veio no fundo do poço. Um lance
- * brilhante está protegido — a folga foi grande demais para o azar cobrar.
- */
-function classificar(margem: number, dado: number, tatica: Tatica): ResultadoLance {
-  const { dadoFatal, margemImune, margemGrave } = TATICAS[tatica];
-  if (margem >= 0) {
-    // O azar é conferido antes da folga: é `margemImune`, e não o brilho do
-    // lance, que decide quem está protegido. Foi assim que a agressiva parou
-    // de ficar blindada pelo próprio bônus.
-    if (dado <= dadoFatal && margem < margemImune) return 'custoso';
-    return margem >= MARGEM_BRILHANTE ? 'brilhante' : 'sucesso';
-  }
-  if (margem > margemGrave) return 'falha';
-  return 'grave';
-}
-
-export function simularCampanha(
-  party: Recrutado[],
-  tatica: Tatica,
-  dia: string,
-  jornada: Desafio[],
-): Campanha {
-  const rnd = mulberry32(hash(`campanha:${dia}:${tatica}:${party.map((h) => h.id).join(',')}`));
-  const vivos = party.slice();
-  const media = moralDaParty(party);
-  const etapas: RelatoEtapa[] = [];
-  let vitorias = 0;
-  let baixas = 0;
-
-  /** Falhou uma prova, acabou a jornada: não se marcha com a companhia em frangalhos. */
-  let acabou = false;
-
-  /**
-   * Frases já usadas na **jornada inteira**, não só na prova. A leitura é o
-   * principal prazer do jogo, e reler a mesma linha estraga o efeito mesmo
-   * quando ela aparece três provas depois.
-   */
-  const frasesUsadas = new Set<string>();
-
-  // Traços que gastam uma carga ao longo da jornada inteira.
-  let amuletoGasto = false;
-  let martirGasto = false;
-  const teimosoUsado = new Set<string>();
-
-  /**
-   * Quem realmente tomba quando o lance cobra uma vida. O Teimoso escapa da
-   * primeira vez que seria atingido; o Mártir toma o lugar de outro, uma vez.
-   * Devolve `null` quando ninguém cai.
-   */
-  function quemTomba(alvo: Recrutado): Recrutado | null {
-    if (alvo.traco === 'teimoso' && !teimosoUsado.has(alvo.id)) {
-      teimosoUsado.add(alvo.id);
-      return null;
-    }
-    const martir = vivos.find((h) => h.traco === 'martir' && h.id !== alvo.id);
-    if (martir && !martirGasto) {
-      martirGasto = true;
-      return martir;
-    }
-    return alvo;
-  }
-
-  jornada.forEach((desafio, indice) => {
-    if (acabou || vivos.length < 2) {
-      etapas.push({
-        numero: indice + 1,
-        desafio,
-        lances: [],
-        sucessos: 0,
-        resultado: 'nao-jogada',
-        caidos: [],
-      });
-      return;
-    }
-
-    const doDesafio = bonusMoral(desafio, media);
-    const lances: RelatoLance[] = [];
-    const caidos: Recrutado[] = [];
-    let sucessos = 0;
-    let anterior: Recrutado | null = null;
-
-    desafio.lances.forEach((lance, i) => {
-      if (vivos.length === 0) return;
-
-      const dificuldade = dificuldadeDoLance(lance.dificuldade, indice);
-      const protagonista = sortearProtagonista(rnd, vivos, lance.eixo, anterior);
-      anterior = protagonista;
-
-      const soma = somaDoGrupo(vivos, lance.eixo);
-      const luto = (party.length - vivos.length) * BONUS_POR_CAIDO;
-      const dosTracos = bonusDosTracos(vivos, {
-        eixo: lance.eixo,
-        prova: desafio.tipo,
-        numeroDoLance: i + 1,
-        totalDeLances: desafio.lances.length,
-        houveBaixa: vivos.length < party.length,
-      });
-      const modificadores =
-        sinergia(vivos).bonus + TATICAS[tatica].bonus + doDesafio + luto + dosTracos.valor;
-
-      // O Amuleto queima uma vez para transformar o pior dado em zero.
-      let dado = rolarDado(rnd);
-      const amuleto = vivos.find((h) => h.traco === 'amuleto');
-      if (amuleto && !amuletoGasto && dado === -4) {
-        dado = 0;
-        amuletoGasto = true;
-      }
-
-      const valor = soma + modificadores + dado;
-      const margem = valor - dificuldade;
-
-      const resultado = classificar(margem, dado, tatica);
-
-      const variantes = NARRACAO[lance.eixo][resultado];
-      const inedita = variantes.filter((v) => !frasesUsadas.has(v));
-      const pool = inedita.length > 0 ? inedita : variantes;
-      const frase = pool[Math.floor(rnd() * pool.length)];
-      frasesUsadas.add(frase);
-      const narracao = frase.replaceAll('{h}', protagonista.nome);
-
-      let caido: Recrutado | null = null;
-      if (resultado === 'grave' || resultado === 'custoso') {
-        caido = quemTomba(protagonista);
-        if (caido) {
-          vivos.splice(vivos.indexOf(caido), 1);
-          caidos.push(caido);
-        }
-      }
-      if (resultado !== 'grave' && resultado !== 'falha') sucessos++;
-
-      lances.push({
-        numero: i + 1,
-        cena: lance.cena,
-        eixo: lance.eixo,
-        protagonista,
-        resultado,
-        somaDoGrupo: soma,
-        modificadores,
-        dado,
-        valor,
-        dificuldade,
-        margem,
-        narracao,
-        caido,
-      });
-    });
-
-    // Uma "falha" não mata, mas também não conta como lance resolvido. Um lance
-    // "custoso" conta: o objetivo foi cumprido, ainda que a um preço.
-    const resolvidos = lances.filter((l) => l.resultado !== 'falha' && l.resultado !== 'grave')
-      .length;
-    const venceu = resolvidos * 2 > desafio.lances.length;
-    let resultado: ResultadoEtapa;
-    if (venceu) {
-      resultado = caidos.length === 0 ? 'vitoria-limpa' : 'vitoria-custosa';
-      vitorias++;
-    } else {
-      resultado = 'derrota';
-      acabou = true;
-    }
-    baixas += caidos.length;
-
-    etapas.push({ numero: indice + 1, desafio, lances, sucessos: resolvidos, resultado, caidos });
-  });
-
-  return {
-    etapas,
-    vitorias,
-    baixas,
-    perfeita: vitorias === jornada.length && baixas === 0,
-    moralDaParty: media,
-  };
-}
-
 /* ---------------------------------------------------------- compartilhamento */
 
 const EMOJI: Record<ResultadoEtapa, string> = {
@@ -505,37 +249,20 @@ const EMOJI: Record<ResultadoEtapa, string> = {
  * O texto de fecho da jornada, escolhido pelo tipo de fim: quem salvou o mundo
  * e a que preço, ou em que altura a estrada acabou.
  */
+/**
+ * O epilogo escrito, dada a chave.
+ *
+ * A chave vem de fora — de `chaveDoEpilogo`, no `despacho.ts` — em vez de ser
+ * deduzida aqui. Antes esta funcao a deduzia sozinha, mas as regras dela
+ * supunham fim subito: `quase-la` e `meio-caminho` descreviam *onde a estrada
+ * parou*, e a estrada nao para mais.
+ */
 export function epilogo(
   campanha: Campanha,
-  /**
-   * A chave, quando quem chama sabe escolher melhor. O modelo de despacho sabe:
-   * as chaves de fim subito daqui — `quase-la`, `meio-caminho` — descrevem onde
-   * a estrada parou, e la ela nunca para.
-   */
-  chaveDeFora?: ChaveEpilogo,
+  chave: ChaveEpilogo,
 ): { titulo: string; texto: string; selo: string } {
   const caidos = campanha.etapas.flatMap((e) => e.caidos.map((h) => h.nome));
   const parou = campanha.etapas.find((e) => e.resultado === 'derrota');
-  const total = campanha.etapas.length;
-
-  let chave: ChaveEpilogo;
-  if (campanha.perfeita) chave = 'perfeita';
-  else if (campanha.vitorias === total) {
-    chave = campanha.baixas === 1 ? 'salvou-com-uma-baixa' : 'salvou-com-baixas';
-  } else if (campanha.baixas >= TAMANHO_PARTY) chave = 'dizimada';
-  else {
-    const numero = parou?.numero ?? campanha.vitorias + 1;
-    chave =
-      numero === total
-        ? 'caiu-no-trono'
-        : numero >= 5
-          ? 'quase-la'
-          : numero >= 3
-            ? 'meio-caminho'
-            : 'jornada-curta';
-  }
-
-  if (chaveDeFora) chave = chaveDeFora;
   const molde = EPILOGOS[chave];
   const nomeDaProva = parou?.desafio.nome ?? 'algum lugar da estrada';
   const sobreviventes = campanha.etapas

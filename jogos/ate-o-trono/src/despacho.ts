@@ -111,10 +111,10 @@ export function definirTronoPorFalha(valor: number) {
 /**
  * As margens da missão.
  *
- * Não dá para reusar as de `TATICAS`: aquelas foram escritas para a margem de
- * **um lance**, e aqui a margem é a soma dos saldos dos eixos cobrados — três,
- * quase sempre. Com as antigas, falhar por 3 pontos no total já era fracasso
- * grave, e o jogador desatento morria em toda missão.
+ * Não deu para reusar as margens do modelo anterior: aquelas foram escritas
+ * para a margem de **um lance**, e aqui a margem é a soma dos saldos dos eixos
+ * cobrados — três, quase sempre. Com as antigas, falhar por 3 pontos no total
+ * já era fracasso grave, e o jogador desatento morria em toda missão.
  *
  * **Não há mais três jogos de margem porque não há mais táticas.** Elas eram um
  * menu com resposta certa: medida a jornada inteira, a agressiva salvava o

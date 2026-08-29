@@ -284,13 +284,14 @@ src/radar.ts     o pentágono em SVG, com a bolinha de cada eixo
 src/retrato.ts   brasões dos heróis e cenários das missões
 src/main.ts      telas, ritmo da revelação, salvamento, compartilhamento
 src/cartao.ts    o cartão de imagem da jornada
-scripts/despachar.ts  calibragem do modelo de despacho
-scripts/conferir.ts   as checagens do roster e do catálogo
+scripts/despachar.ts  calibragem: --varrer, --peso, --trono, --inteiro, --draft, --perfil, --exemplo
+scripts/politicas.ts  os jogadores sintéticos, usados pela calibragem e pelas checagens
+scripts/conferir.ts   as 41 checagens
+scripts/comum.ts      carregamento dos dados e montagem de companhias sintéticas
 scripts/avaliar.ts    quanto vale uma companhia para quem não sabe o que o dia cobra
+scripts/normalizar.ts iguala o total de pontos do elenco (só ao mexer no elenco)
 ```
 
-`src/motor.ts` ainda carrega `simularCampanha`, a simulação lance a lance do
-modelo anterior. Hoje só o `scripts/tune.ts` a usa — o `conferir.ts` foi migrado
-para o motor de despacho, porque checagem que testa um motor aposentado passa
-verde enquanto o jogo publicado pode estar quebrado. Os dois são candidatos a
-remoção quando ninguém mais quiser consultar a calibragem antiga.
+O motor lance a lance do modelo anterior foi removido junto com o calibrador
+dele — o histórico do git guarda os dois, e a razão de cada número que eles
+mediram está escrita acima.

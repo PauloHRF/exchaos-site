@@ -42,6 +42,10 @@ npm run build   # monta o dist/
 npm run preview # constrói e serve o dist/ para conferir
 ```
 
+Cada jogo com build tem os seus próprios comandos, rodados de dentro da pasta
+dele. No Até o Trono: `npm run conferir` (as checagens) e `npm run despachar`
+(a calibragem).
+
 **No Cloudflare Pages:** *build command* `npm run build`, *output directory*
 `dist`. Se o build falhar, o Pages mantém o último deploy bem-sucedido no ar —
 ele não derruba o site, apenas não atualiza.

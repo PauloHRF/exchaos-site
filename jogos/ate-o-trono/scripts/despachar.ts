@@ -55,6 +55,33 @@ function medirDraft(nivel: Nivel, amostras = AMOSTRAS) {
   return { salvou: (salvou / amostras) * 100, baixas: baixas / amostras };
 }
 
+if (process.argv.includes('--perfil')) {
+  // Onde as somas da companhia caem em cada eixo, por jeito de recrutar. Não
+  // depende do modelo de resolução: serve para trabalho de elenco, e veio do
+  // tune.ts quando ele foi aposentado junto com o motor antigo.
+  console.log('Soma da companhia por eixo, por jeito de recrutar');
+  console.log('(a companhia sempre tem 160 pontos no total)');
+  console.log('');
+  console.log('nível         ' + EIXOS.map((e) => e.slice(0, 6).padStart(9)).join(''));
+  for (const nivel of NIVEIS) {
+    const porEixo: Record<string, number[]> = Object.fromEntries(EIXOS.map((e) => [e, []]));
+    for (let i = 0; i < 1500; i++) {
+      const dia = `perfil-${i}`;
+      const { party } = montarParty(dia, nivel, mulberry32(hash(`${nivel}:${dia}`)));
+      for (const e of EIXOS) porEixo[e].push(party.reduce((t, h) => t + h[e], 0));
+    }
+    for (const q of [10, 50, 90]) {
+      const linha = EIXOS.map((e) => {
+        const ord = porEixo[e].slice().sort((a, b) => a - b);
+        return String(ord[Math.floor((q / 100) * (ord.length - 1))]).padStart(9);
+      }).join('');
+      console.log(`${nivel.slice(0, 10).padEnd(10)} p${q}`.padEnd(14) + linha);
+    }
+    console.log('');
+  }
+  process.exit(0);
+}
+
 if (process.argv.includes('--draft')) {
   console.log('O draft ainda importa? Despacho fixo no zeloso, so o draft varia.');
   console.log('');

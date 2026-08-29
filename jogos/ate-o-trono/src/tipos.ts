@@ -109,8 +109,6 @@ export interface Recusa {
   texto: string;
 }
 
-export type Tatica = 'agressiva' | 'equilibrada' | 'defensiva';
-
 /** Um lance é um momento do desafio: um eixo posto à prova. */
 export interface Lance {
   /** O que está acontecendo, antes de saber quem age. */

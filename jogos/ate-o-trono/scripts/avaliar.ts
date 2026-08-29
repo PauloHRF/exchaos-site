@@ -68,13 +68,11 @@ const FRACAO_APOS_BAIXA = 0.302;
  * devolve só +2 de luto, então custa ~4,4 de soma pelos ~30% de jornada que
  * ainda resta. É o bastante para virar um punhado de lances — mas o número é
  * estimativa, e por isso está aqui em cima, isolado, em vez de diluído na conta.
- * `--ablacao` zera este valor para mostrar que a conclusão do experimento não
- * depende dele.
+ * Já foi possível zerá-lo por linha de comando, para mostrar que a conclusão do
+ * experimento não dependia do palpite; o modo morreu junto com o calibrador do
+ * modelo antigo. A conclusão segue registrada no histórico.
  */
-export let VALOR_DE_UMA_VIDA = 1.2;
-export function zerarValorDaVida() {
-  VALOR_DE_UMA_VIDA = 0;
-}
+const VALOR_DE_UMA_VIDA = 1.2;
 
 /** A faixa de dificuldade que o catálogo realmente usa, já com o degrau da etapa. */
 export interface Faixa {

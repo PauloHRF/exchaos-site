@@ -2,7 +2,6 @@ import type {
   Eixo,
   Etiqueta,
   ResultadoLance,
-  Tatica,
   TipoDesafio,
   Traco,
   TracoId,
@@ -200,66 +199,7 @@ export const TRACOS: Record<TracoId, Traco> = {
   },
 };
 
-/**
- * Margem acima da qual o lance sai brilhante — e, por ser folgado demais, fica
- * imune ao fracasso crítico. Quanto mais baixa, mais lances ficam protegidos
- * do azar e mais a jornada sem baixas vem de brinde junto com as sete vitórias.
- */
-export const MARGEM_BRILHANTE = 10;
 
-/**
- * Tudo é somado, nada é multiplicado: nesta escala um multiplicador vira
- * número quebrado e o jogador perde a conta de cabeça.
- *
- * Três regras governam as baixas, e é aí que mora o dilema:
- *
- * - `dadoFatal` é o fracasso crítico: com o dado nesse valor ou abaixo, alguém
- *   fica pelo caminho mesmo que o lance seja vencido. É azar puro, e existe
- *   justamente porque tudo o mais no modelo depende da força da party — sem
- *   isso, quem é forte o bastante para vencer as sete etapas nunca perde
- *   ninguém, e chegar inteiro viria de graça junto com chegar ao trono.
- * - `margemImune` protege as vitórias folgadas desse azar. É o que dá à
- *   defensiva o nicho de perder pouca gente sem torná-la imortal — porque
- *   tática imune a azar chega inteira, por construção, sempre que chega ao fim.
- * - `margemGrave` é o quanto se pode falhar antes de perder alguém.
- */
-export const TATICAS: Record<
-  Tatica,
-  {
-    nome: string;
-    descricao: string;
-    bonus: number;
-    dadoFatal: number;
-    /** Vitória com margem igual ou maior que esta não pode ser cobrada em vida. */
-    margemImune: number;
-    margemGrave: number;
-  }
-> = {
-  agressiva: {
-    nome: 'Agressiva',
-    descricao: '+4 em todo lance, e vence muito mais. Só que o pior dado cobra uma vida mesmo numa vitória folgada.',
-    bonus: 4,
-    dadoFatal: -4,
-    margemImune: 99,
-    margemGrave: -2,
-  },
-  equilibrada: {
-    nome: 'Equilibrada',
-    descricao: 'Sem bônus e sem desconto. O pior dado cobra uma vida, a não ser que a vitória tenha sido folgada.',
-    bonus: 0,
-    dadoFatal: -4,
-    margemImune: MARGEM_BRILHANTE,
-    margemGrave: -5,
-  },
-  defensiva: {
-    nome: 'Defensiva',
-    descricao: '−4 em todo lance, e vence bem menos. Em troca, só perde gente quando passa raspando.',
-    bonus: -4,
-    dadoFatal: -4,
-    margemImune: 3,
-    margemGrave: -9,
-  },
-};
 
 /** Composição fixa da jornada: quatro combates (contando o trono) e três provas. */
 export const COMPOSICAO_DA_JORNADA: TipoDesafio[] = [
@@ -282,13 +222,6 @@ export const DEGRAU_DA_ETAPA = [-4, -3, -2, -1, 0, 1, 2];
 /** Quanto a moral média da party soma num desafio que favorece um lado. */
 export const PESO_MORAL_NO_DESAFIO = 1;
 
-/**
- * O luto: cada herói caído dá isto de bônus a quem sobrou. Sem esse
- * amortecedor, perder alguém derruba a soma do grupo e a party não volta mais
- * a vencer — e aí toda jornada de sete vitórias acaba sendo, por construção,
- * uma jornada sem baixas. É o que separa chegar de chegar inteiro.
- */
-export const BONUS_POR_CAIDO = 2;
 
 export const SINERGIA = {
   /** Por herói extra da mesma guilda. */
@@ -510,10 +443,7 @@ export type ChaveEpilogo =
   | 'salvou-com-uma-baixa'
   | 'salvou-com-baixas'
   | 'dizimada'
-  | 'caiu-no-trono'
-  | 'quase-la'
-  | 'meio-caminho'
-  | 'jornada-curta';
+  | 'caiu-no-trono';
 
 export const EPILOGOS: Record<ChaveEpilogo, { titulo: string; textos: string[] }> = {
   perfeita: {
@@ -574,30 +504,6 @@ export const EPILOGOS: Record<ChaveEpilogo, { titulo: string; textos: string[] }
       'A porta do salão se abriu para eles. Foi a única coisa que se abriu.',
     ],
   },
-  'quase-la': {
-    titulo: 'A estrada acabou antes',
-    textos: [
-      'A companhia parou em {prova}, a um par de passos do fim. Faltou pouco — e pouco também é falta.',
-      'Venceram {provas} provas. A seguinte se chamava {prova}, e é onde a história para de avançar.',
-      'Dava para ver o fim daqui. Em {prova} deixou de dar.',
-    ],
-  },
-  'meio-caminho': {
-    titulo: 'Metade do caminho',
-    textos: [
-      'Em {prova} a marcha parou. Chegaram longe o bastante para o Rei Demônio ouvir falar deles, e perto demais do começo para que isso importe.',
-      'Meio caminho é o pior lugar para parar: longe demais para voltar, perto demais para ter valido.',
-      '{provas} provas vencidas e uma perdida, que é a única que a estrada guarda.',
-    ],
-  },
-  'jornada-curta': {
-    titulo: 'Jornada curta',
-    textos: [
-      'Acabou em {prova}, antes de a estrada virar história. Alguns nomes o mundo nem chega a aprender.',
-      'A companhia se desfez em {prova}. Levaram mais tempo escolhendo quem viria do que marchando.',
-      'Nem deu tempo de a estrada aprender os nomes deles.',
-    ],
-  },
 };
 
 /** Fecho de acordo com a moral da companhia, acrescentado ao epílogo. */
@@ -627,10 +533,3 @@ export const ROTULO_RESULTADO: Record<ResultadoLance, string> = {
   grave: 'Fracasso grave',
 };
 
-export const MARCADOR_LANCE: Record<ResultadoLance, string> = {
-  brilhante: '★',
-  sucesso: '●',
-  custoso: '◍',
-  falha: '○',
-  grave: '✝',
-};
