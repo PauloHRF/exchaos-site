@@ -1,0 +1,356 @@
+/*
+ * Cifra — o estilo do jogo.
+ *
+ * Nenhuma cor da marca tem valor literal aqui. Os tokens vêm de
+ * `/assets/brand/exchaos.css` (que importa `tokens.css`), carregado pelo HTML;
+ * este arquivo só os apelida para os nomes que o jogo usa e deriva os tons que
+ * só ele precisa.
+ *
+ * Sobre os três contadores: o original usa verde/amarelo/vermelho, e a marca
+ * **não tem verde** — onde a intuição pede verde, a ExChaos usa Arcano. Então
+ * a leitura foi remapeada, não portada:
+ *
+ *   no lugar   → Arcano  (o acerto da marca)
+ *   na palavra → Vela    (o quase, quente)
+ *   fora       → Névoa   (o descartado, que some)
+ *
+ * Deixar o "fora" em Névoa em vez de Sangue tem motivo duplo: é o número que
+ * mais aparece, e encher a tela de Sangue gastaria justamente a cor que a marca
+ * reserva para dose pequena. O Sangue ficou para a última tentativa e para a
+ * derrota, que é onde a tensão de verdade está.
+ */
+
+:root{
+  --lugar:var(--arcane);
+  --palavra:var(--candle);
+  --fora:var(--muted);
+  --perigo:var(--oxblood);
+  --celula:var(--ink);
+  --celula-viva:var(--ink-2);
+
+  /*
+   * O lado da célula é fixo, não `1fr`. São oito linhas: deixar a célula
+   * esticar até a largura do container dá um tabuleiro alto demais, que empurra
+   * o teclado para fora da tela — e num jogo de dedução você precisa ver as
+   * tentativas anteriores e digitar ao mesmo tempo.
+   *
+   * Por isso a conta olha as duas dimensões. O `vw` segura tela estreita (são
+   * oito colunas por linha, não cinco); o `vh` menos os ~345px de cabeçalho,
+   * teclado e folgas divide o que sobra pelas oito linhas. O `max()` é o piso:
+   * abaixo de 36px a letra deixa de ser legível, e aí é melhor a página rolar
+   * do que o tabuleiro sumir.
+   */
+  --cel:max(36px, min(52px, 12vw, (100vh - 345px) / 8));
+  --num:calc(var(--cel) * .62);
+  --folga:clamp(4px, 1.2vw, 6px);
+}
+
+body{
+  display:flex;flex-direction:column;align-items:center;
+  padding:12px 14px 24px;gap:8px;min-height:100vh;
+}
+
+/* ---------- cabeçalho ---------- */
+
+/*
+ * Uma barra só: voltar, nome, número da rodada, e os dois botões. Já foi
+ * cabeçalho centralizado com subtítulo mais uma barra de modos embaixo, e as
+ * duas linhas juntas comiam ~90px de altura — que é quase duas linhas do
+ * tabuleiro, num jogo que tem oito.
+ */
+.topo{
+  display:flex;align-items:center;gap:9px;
+  width:100%;max-width:440px;
+}
+.voltar{
+  font-family:var(--fm);font-size:17px;line-height:1;color:var(--muted);
+  padding:4px 2px;transition:.16s;
+}
+.voltar:hover{color:var(--arcane)}
+h1{
+  font-family:var(--fd);font-weight:600;font-size:clamp(22px,6.4vw,28px);
+  letter-spacing:.05em;margin:0;line-height:1.1;
+}
+.selo-rodada{
+  font-family:var(--fm);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);margin-right:auto;white-space:nowrap;
+}
+.icone{
+  display:grid;place-items:center;flex:none;
+  font-family:var(--fd);font-size:15px;line-height:1;
+  width:28px;height:28px;border-radius:7px;cursor:pointer;transition:.16s;
+  background:transparent;color:var(--muted);border:1px solid var(--line);
+}
+.icone svg{width:13px;height:13px;fill:currentColor}
+.icone:hover{border-color:var(--arcane);color:var(--parchment)}
+
+/* ---------- legenda ---------- */
+
+.legenda{
+  display:flex;gap:14px;justify-content:center;flex-wrap:wrap;
+  font-family:var(--fm);font-size:9px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 8px;
+}
+.legenda span{display:inline-flex;align-items:center;gap:5px}
+
+.pt{width:8px;height:8px;border-radius:2px;display:inline-block;flex:none}
+.pt--lugar{background:var(--lugar)}
+.pt--palavra{background:var(--palavra)}
+.pt--fora{background:var(--fora)}
+
+/* ---------- tabuleiro ---------- */
+
+main{width:100%;max-width:440px;display:flex;flex-direction:column;align-items:center}
+
+.tabuleiro{display:flex;flex-direction:column;gap:var(--folga);width:100%}
+
+/*
+ * A linha é uma grade de oito: cinco casas e três contadores. Os contadores já
+ * foram um bloco separado, com folga própria entre os grupos — virar coluna da
+ * mesma grade alinhou tudo e devolveu a largura que aquela folga gastava.
+ */
+.linha{
+  display:grid;
+  grid-template-columns:repeat(5,var(--cel)) repeat(3,var(--num));
+  justify-content:center;gap:var(--folga);align-items:center;
+}
+
+/*
+ * A letra da casa é monoespaçada, não a display da marca. A Grenze Gotisch é
+ * gótica: bonita no título e ilegível numa casa sozinha, onde não há palavra em
+ * volta para desambiguar — I de J, C de E. Num jogo em que a leitura de cada
+ * letra é a jogada, isso é defeito, não estilo. A mono ainda cai bem no tema:
+ * cifra se lê em máquina.
+ */
+.celula{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  background:var(--celula);border:1px solid var(--line);border-radius:6px;
+  font-family:var(--fm);font-weight:500;font-size:calc(var(--cel) * .52);
+  color:var(--parchment);line-height:1;user-select:none;transition:.12s;
+}
+.celula--cheia{background:var(--celula-viva);border-color:var(--arcane-deep)}
+.celula--branco{color:var(--palavra);border-style:dashed;border-color:var(--palavra)}
+.linha--ativa .celula{cursor:pointer}
+.linha--ativa .celula--cheia{border-color:var(--arcane)}
+.linha--ultima.linha--ativa .celula{border-color:var(--perigo)}
+.linha--julgada .celula{background:var(--celula);border-color:var(--line);color:var(--parchment-dim)}
+
+/*
+ * As marcas do jogador, na casa do chute. A marca é da *ocorrência*, não da
+ * letra — por isso mora aqui e não no teclado.
+ *
+ * O ponto no canto separa as duas origens: com ponto, é prova (o jogo deduziu
+ * dos seus próprios chutes e não dá pra desfazer); sem ponto, é palpite seu.
+ */
+.linha--julgada .celula[data-casa]{cursor:pointer;position:relative}
+.linha--julgada .celula[data-casa]:hover{border-color:var(--muted)}
+.linha--julgada .celula[data-casa]:focus-visible{outline:2px solid var(--arcane);outline-offset:2px}
+.linha--julgada .celula[data-marca="1"]{
+  background:color-mix(in srgb,var(--lugar) 34%,var(--celula));
+  border-color:var(--lugar);color:#F3ECFF;
+}
+.linha--julgada .celula[data-marca="2"]{
+  background:color-mix(in srgb,var(--palavra) 30%,var(--celula));
+  border-color:var(--palavra);color:var(--parchment);
+}
+.linha--julgada .celula[data-marca="3"]{
+  background:transparent;border-color:var(--line);color:var(--line);
+  text-decoration:line-through;text-decoration-thickness:1px;
+}
+.linha--julgada .celula[data-provada="1"]::after{
+  content:"";position:absolute;top:3px;right:3px;
+  width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.75;
+}
+
+/* a casa selecionada: onde a próxima letra cai */
+.celula--cursor{
+  border-color:var(--arcane) !important;
+  box-shadow:0 0 0 1px var(--arcane), 0 0 12px -2px var(--arcane);
+  position:relative;
+}
+/*
+ * O traço pisca aceso ou apagado, sem meio-termo. Antes era `steps(2,start)`
+ * sobre keyframes de opacidade, o que divide o intervalo *entre* keyframes em
+ * degraus — e degrau de fade ainda é fade, só que picotado. `step-end` segura o
+ * valor de cada keyframe até o próximo: dois estados, nada entre eles.
+ */
+.celula--cursor::after{
+  content:"";position:absolute;left:22%;right:22%;bottom:4px;height:2px;
+  background:var(--arcane);border-radius:1px;
+  animation:piscar 1s step-end infinite;
+}
+@keyframes piscar{0%{opacity:1}50%{opacity:0}}
+
+/*
+ * Os contadores. Nas linhas ainda não jogadas eles aparecem vazios, só com a
+ * cor: sem número, porque não houve chute — mas presentes, porque a forma do
+ * retorno é a coisa menos óbvia deste jogo e vale dizê-la antes do primeiro
+ * chute, não depois.
+ */
+.num{
+  width:var(--num);height:var(--num);border-radius:5px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fm);font-weight:500;font-size:calc(var(--num) * .48);
+  line-height:1;user-select:none;
+}
+.num--lugar{background:color-mix(in srgb,var(--lugar) 26%,transparent);color:var(--lugar)}
+.num--palavra{background:color-mix(in srgb,var(--palavra) 24%,transparent);color:var(--palavra)}
+.num--fora{background:color-mix(in srgb,var(--fora) 18%,transparent);color:var(--fora)}
+.num--vazio{opacity:.3}
+
+.linha--erro{animation:tremer .3s}
+@keyframes tremer{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-6px)}
+  75%{transform:translateX(6px)}
+}
+
+.aviso{
+  font-family:var(--fm);font-size:11px;letter-spacing:.03em;color:var(--palavra);
+  min-height:20px;margin:8px 0 2px;text-align:center;line-height:1.4;
+}
+
+/* ---------- teclado ---------- */
+
+.teclado{display:flex;flex-direction:column;gap:5px;width:100%;margin-top:2px}
+.fila{display:flex;gap:4px;justify-content:center}
+.tecla{
+  flex:1;min-width:0;height:clamp(36px,5.8vh,44px);border-radius:6px;cursor:pointer;transition:.12s;
+  background:var(--ink-2);color:var(--parchment);border:1px solid var(--line);
+  font-family:var(--fm);font-size:14px;text-transform:uppercase;
+  user-select:none;-webkit-user-select:none;touch-action:manipulation;
+}
+.tecla:hover{border-color:var(--arcane);background:var(--ink)}
+.tecla:active{transform:translateY(1px)}
+.tecla--larga{flex:1.7;font-size:11px;letter-spacing:.1em}
+.tecla--branco{color:var(--palavra);font-size:17px}
+.tecla--branco:hover{border-color:var(--palavra)}
+
+.dica-teclado{
+  font-family:var(--fm);font-size:9px;letter-spacing:.05em;color:var(--muted);
+  text-align:center;margin:10px 0 0;line-height:1.9;
+}
+.dica-teclado .ex{font-weight:500;padding:2px 5px;border-radius:4px;margin:0 1px}
+.ex--1{background:color-mix(in srgb,var(--lugar) 34%,transparent);color:var(--lugar)}
+.ex--2{background:color-mix(in srgb,var(--palavra) 30%,transparent);color:var(--palavra)}
+/*
+ * O exemplo de "errada" é Névoa, não Linha. Na casa do tabuleiro a marca some
+ * mesmo — é o descartado, e sumir é a leitura certa. Aqui é palavra em texto
+ * corrido, que precisa ser lida: em Linha ela ficava na cor do fundo.
+ */
+.ex--3{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px}
+.dica-teclado button{
+  background:transparent;border:0;cursor:pointer;padding:0;
+  font-family:var(--fm);font-size:9px;letter-spacing:.05em;color:var(--muted);
+  text-decoration:underline;text-underline-offset:3px;
+}
+.dica-teclado button:hover{color:var(--perigo)}
+
+/* ---------- estatísticas ---------- */
+
+/* o resumo vem depois do gráfico, então a folga mudou de lado */
+.stats-numeros{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
+  text-align:center;margin:20px 0 2px;
+}
+.stats-numeros b{
+  display:block;font-family:var(--fm);font-weight:500;font-size:26px;
+  color:var(--parchment);line-height:1.2;
+}
+.stats-numeros span{
+  font-family:var(--fm);font-size:8px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);
+}
+.stats-dist{display:flex;flex-direction:column;gap:4px}
+.stats-barra{
+  display:grid;grid-template-columns:12px 1fr 16px;align-items:center;gap:8px;
+  font-family:var(--fm);font-size:10px;color:var(--muted);
+}
+.stats-barra i{
+  height:15px;border-radius:3px;background:var(--line);display:block;min-width:0;
+  transition:width .3s;
+}
+.stats-barra i.atual{background:var(--lugar)}
+.stats-barra b{font-weight:500;color:var(--parchment-dim);text-align:right}
+.stats-vazio{
+  font-family:var(--fb);font-size:14px;color:var(--muted);font-style:italic;margin:0;
+}
+.stats-no-fim{margin:18px 0 20px;padding-top:16px;border-top:1px solid var(--line)}
+/* o gráfico abre o bloco: o h3 não precisa da folga que teria no meio do texto */
+.stats-no-fim > h3:first-child{margin-top:0}
+
+/* ---------- modais ---------- */
+
+.modal{
+  background:var(--ink);color:var(--parchment);border:1px solid var(--line);border-radius:12px;
+  max-width:440px;width:calc(100% - 32px);padding:26px 24px;position:relative;
+  font-family:var(--fb);line-height:1.6;
+  /* a ajuda é mais alta que uma janela baixa: rola por dentro, não por fora */
+  max-height:calc(100vh - 40px);overflow-y:auto;
+}
+
+/*
+ * A ajuda é mais larga no desktop. No celular nada muda: o `width` de
+ * `calc(100% - 32px)` já é menor que este teto, então ele só entra em cena
+ * quando há tela pra ele. A folga extra vira respiro, não linha mais longa —
+ * o texto para em 62ch, que é onde a leitura ainda é confortável.
+ */
+.modal--largo{max-width:620px}
+@media (min-width:680px){
+  .modal--largo{padding:32px 36px}
+  .modal--largo p{max-width:62ch}
+}
+.modal::backdrop{background:rgba(8,6,12,.78)}
+.modal h2{font-family:var(--fd);font-weight:600;font-size:30px;margin:0 0 14px;letter-spacing:.03em}
+.modal h3{
+  font-family:var(--fm);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--arcane);margin:20px 0 8px;font-weight:500;
+}
+.modal p{margin:0 0 12px;font-size:15px}
+.modal code{font-family:var(--fm);font-size:13px;color:var(--palavra)}
+.modal .ex{font-family:var(--fm);font-size:12px;padding:2px 6px;border-radius:4px}
+.modal .btn{border:0;cursor:pointer;margin-top:8px}
+
+/*
+ * Os nomes das cores, na cor que nomeiam. Vale mais que descrevê-las: o texto
+ * fala "Roxa" e o leitor vê o mesmo bloco roxo que vai encontrar no tabuleiro,
+ * sem ter que casar as duas coisas de cabeça.
+ */
+.modal .cor{
+  font-family:var(--fm);font-size:12px;font-weight:500;letter-spacing:.06em;
+  padding:2px 8px;border-radius:4px;white-space:nowrap;
+}
+.cor--lugar{background:color-mix(in srgb,var(--lugar) 30%,transparent);color:var(--lugar)}
+.cor--palavra{background:color-mix(in srgb,var(--palavra) 28%,transparent);color:var(--palavra)}
+.cor--fora{background:color-mix(in srgb,var(--fora) 22%,transparent);color:var(--fora)}
+
+/* o veredito é o título do card: entra maior que o "Como jogar" dos outros */
+.veredito{
+  font-family:var(--fd);font-weight:600;font-size:clamp(34px,9vw,46px);
+  letter-spacing:.03em;line-height:1.05;margin:0 0 8px;
+}
+.revelacao{color:var(--muted);font-size:15px}
+/*
+ * A resposta revelada é Arcano, não Vela. Vela é o "quase" — a letra que está
+ * na palavra mas fora do lugar. Pintar a resposta certa com a cor do quase
+ * contradizia a própria legenda e a regra da marca de que Arcano é o acerto
+ * onde a intuição pediria verde.
+ */
+.revelacao b{
+  color:var(--lugar);font-family:var(--fm);font-weight:500;font-size:21px;letter-spacing:.14em;
+}
+.partilha{
+  font-family:var(--fm);font-size:13px;line-height:1.7;color:var(--parchment-dim);
+  background:var(--obsidian-deep);border:1px solid var(--line);border-radius:8px;
+  padding:12px 14px;margin:16px 0 12px;white-space:pre;overflow-x:auto;
+}
+.proxima{
+  font-family:var(--fm);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);margin:0;
+}
+.acoes{display:flex;gap:10px;flex-wrap:wrap}
+.fechar{
+  position:absolute;top:10px;right:12px;background:transparent;border:0;cursor:pointer;
+  color:var(--muted);font-size:24px;line-height:1;font-family:var(--fb);
+}
+.fechar:hover{color:var(--parchment)}

@@ -29,6 +29,11 @@ const FORA_DO_SITE = new Set([
   '.git',
   '.github',
   '.gitignore',
+  // Configuração de deploy e cache local do wrangler: dizem respeito a *como*
+  // o site sobe, não ao site. Iam publicados junto, servidos em
+  // `/wrangler.jsonc` e `/.wrangler/`.
+  '.wrangler',
+  'wrangler.jsonc',
   'node_modules',
   'dist',
   'scripts',
@@ -52,7 +57,13 @@ async function copiarEstatico() {
         const caminho = join(origem, item);
         const info = await stat(caminho);
         if (info.isDirectory() && ehJogoConstruido(caminho)) continue;
-        await cp(caminho, join(saida, 'jogos', item), { recursive: true });
+        // O `README.md` de um jogo é o repasse dele, escrito para quem mexe no
+        // código — não para quem joga. Na raiz ele já era excluído; aqui dentro
+        // não era, e ia parar em `/jogos/<slug>/README.md`, no ar.
+        await cp(caminho, join(saida, 'jogos', item), {
+          recursive: true,
+          filter: (de) => !de.endsWith('README.md'),
+        });
       }
       continue;
     }

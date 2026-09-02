@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cifra — ExChaos</title>
+<meta name="description" content="Oito tentativas para uma palavra de cinco letras. O oráculo conta quantas você acertou — nunca diz quais.">
+<meta property="og:title" content="Cifra — ExChaos">
+<meta property="og:description" content="Oito tentativas para uma palavra de cinco letras. O oráculo conta quantas você acertou — nunca diz quais.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://exchaos.com.br/jogos/cifra/">
+<meta property="og:image" content="https://exchaos.com.br/assets/brand/exchaos-favicon-512.png">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/brand/exchaos-favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/brand/exchaos-favicon-180.png">
+<link rel="stylesheet" href="/assets/brand/exchaos.css">
+<link rel="stylesheet" href="./estilo.css">
+</head>
+<body>
+
+<header class="topo">
+  <a class="voltar" href="/jogos/" aria-label="Voltar aos jogos" title="Voltar aos jogos">←</a>
+  <h1>Cifra</h1>
+  <span class="selo-rodada" id="selo-rodada"></span>
+  <button type="button" class="icone" id="btn-stats" aria-label="Estatísticas" title="Estatísticas">
+    <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      <rect x="1.5" y="9"   width="3" height="5.5" rx="1"/>
+      <rect x="6.5" y="5"   width="3" height="9.5" rx="1"/>
+      <rect x="11.5" y="1.5" width="3" height="13" rx="1"/>
+    </svg>
+  </button>
+  <button type="button" class="icone" id="btn-ajuda" aria-label="Como jogar" title="Como jogar">?</button>
+</header>
+
+<main>
+  <p class="legenda" aria-hidden="true">
+    <span><i class="pt pt--lugar"></i>no lugar</span>
+    <span><i class="pt pt--palavra"></i>na palavra</span>
+    <span><i class="pt pt--fora"></i>fora</span>
+  </p>
+
+  <div id="tabuleiro" class="tabuleiro" role="grid" aria-label="Tentativas"></div>
+
+  <p class="aviso" id="aviso" role="status" aria-live="polite"></p>
+
+  <div id="teclado" class="teclado"></div>
+
+  <p class="dica-teclado">
+    clique numa letra já chutada para marcar
+    <b class="ex ex--1">certa</b> <b class="ex ex--2">meio certa</b> <b class="ex ex--3">errada</b>
+    · <button type="button" id="btn-limpar-marcas">limpar marcas</button>
+  </p>
+</main>
+
+<dialog id="modal-ajuda" class="modal modal--largo">
+  <h2>Como jogar</h2>
+  <p>Uma palavra de <b>cinco letras</b>, <b>oito tentativas</b>, uma por dia.</p>
+  <p>Depois de cada chute ele devolve três números.
+    <b class="cor cor--lugar">Roxa</b>: quantas letras estão na posição certa.
+    <b class="cor cor--palavra">Amarela</b>: quantas existem, mas noutro lugar.
+    <b class="cor cor--fora">Cinza</b>: quantas não estão na palavra.</p>
+
+  <h3>O branco</h3>
+  <p>A barra de espaço deixa uma casa em <b>branco</b> (<code>_</code>), no máximo <b>uma por chute</b>. O branco não conta em nenhum dos três números.</p>
+  <p>Mesmo com branco, o chute precisa caber no dicionário — <code>P_NAS</code> vale porque existe palavra que encaixa no molde.</p>
+
+  <h3>As marcas</h3>
+  <p>Clique numa letra já chutada para marcá-la <b class="ex ex--1">certa</b>, <b class="ex ex--2">meio certa</b> ou <b class="ex ex--3">errada</b>. Outro clique passa para a marca seguinte.</p>
+
+  <h3>Acentos</h3>
+  <p>Digite sem acento. O jogo compara sem acento e só mostra a grafia certa no fim.</p>
+
+  <form method="dialog"><button class="btn btn--primary">Entendi</button></form>
+</dialog>
+
+<dialog id="modal-stats" class="modal">
+  <h2>Estatísticas</h2>
+  <div id="stats-corpo"></div>
+  <form method="dialog"><button class="fechar" aria-label="Fechar">×</button></form>
+</dialog>
+
+<dialog id="modal-fim" class="modal">
+  <p class="veredito" id="fim-veredito"></p>
+  <p class="revelacao">a palavra era <b id="fim-palavra"></b></p>
+
+  <div id="fim-stats" class="stats-no-fim"></div>
+
+  <div class="acoes">
+    <button type="button" class="btn btn--primary" id="btn-copiar">Copiar resultado</button>
+  </div>
+
+  <!--
+    O resultado não aparece: só vai para a área de transferência. Ele existe
+    para ser colado noutro lugar, e quem acabou de jogar já viu o tabuleiro —
+    mostrá-lo aqui é repetir a partida em miniatura. Este bloco só desaparece
+    de `hidden` se a cópia falhar, e aí vira o plano B para copiar à mão.
+  -->
+  <pre class="partilha" id="fim-partilha" hidden></pre>
+
+  <p class="proxima" id="fim-proxima"></p>
+  <form method="dialog"><button class="fechar" aria-label="Fechar">×</button></form>
+</dialog>
+
+<script type="module" src="./jogo.js"></script>
+</body>
+</html>

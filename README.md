@@ -15,9 +15,11 @@ Portal de jogos de navegador. Deploy no Cloudflare Pages (push-to-deploy).
 ├─ jogos/
 │  ├─ index.html         # o portal: lista os jogos (lê jogos.json)
 │  ├─ jogos.json         # catálogo — adicione entradas aqui
-│  ├─ exemplo/           # jogo estático: só um HTML
+│  ├─ cifra/             # jogo estático: HTML, CSS e JS soltos
 │  └─ ate-o-trono/       # jogo com build: tem package.json
-└─ scripts/construir.mjs # monta o dist/
+└─ scripts/
+   ├─ construir.mjs     # monta o dist/
+   └─ cifra-palavras.mjs # gera o vocabulário da Cifra (roda à mão)
 ```
 
 ## O build
@@ -52,7 +54,10 @@ ele não derruba o site, apenas não atualiza.
 
 ## Adicionar um jogo
 
-**Estático:** duplique `jogos/exemplo/` para `jogos/<slug>/` e construa dentro.
+**Estático:** crie `jogos/<slug>/` com um `index.html` e o que mais ele precisar.
+Não há molde a duplicar: o mínimo é uma página. Referencie a marca por caminho
+**absoluto** (`/assets/brand/...`) e tudo que for seu por caminho **relativo** —
+a Cifra serve de referência viva dessa divisão.
 
 **Com build:** crie `jogos/<slug>/` com o `package.json` do jogo, cujo
 `npm run build` precisa deixar a saída em `<slug>/dist/`. Acrescente o caminho

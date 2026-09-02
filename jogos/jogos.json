@@ -11,12 +11,14 @@
     ]
   },
   {
-    "slug": "exemplo",
-    "titulo": "Exemplo",
-    "descricao": "Um placeholder pra mostrar a estrutura. Duplique esta pasta para começar um jogo novo.",
-    "status": "em-breve",
+    "slug": "cifra",
+    "titulo": "Cifra",
+    "descricao": "Cinco letras, oito tentativas. O oráculo conta quantas você acertou e nunca diz quais — descobrir o quê é o jogo inteiro.",
+    "status": "no-ar",
     "tags": [
-      "placeholder"
+      "palavras",
+      "diário",
+      "dedução"
     ]
   }
 ]
