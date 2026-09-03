@@ -196,6 +196,7 @@ export function deduzir(chutes, alvo) {
   const ausentes = new Set();
   const presentes = new Set();
   const posicoes = new Set();     // chaves `linha:casa` provadas no lugar
+  const colunas = new Set();      // as mesmas, por `casa:letra` — valem em todo chute
 
   let mudou = true;
   while (mudou) {
@@ -209,7 +210,9 @@ export function deduzir(chutes, alvo) {
       const digitadas = [...chute].filter((c) => c !== BRANCO).length;
       if (digitadas > 0 && p.lugar === digitadas) {
         for (let i = 0; i < TAM; i++) {
-          if (chute[i] !== BRANCO) posicoes.add(`${l}:${i}`);
+          if (chute[i] === BRANCO) continue;
+          posicoes.add(`${l}:${i}`);
+          colunas.add(`${i}:${chute[i]}`);
         }
       }
 
@@ -226,7 +229,7 @@ export function deduzir(chutes, alvo) {
     }
   }
 
-  return { ausentes, presentes, posicoes };
+  return { ausentes, presentes, posicoes, colunas };
 }
 
 // ---------------------------------------------------------------- estado
@@ -247,7 +250,9 @@ const estado = {
   fim: null,
   contabilizada: false,
   marcas: {},          // as marcas postas à mão
-  provado: { ausentes: new Set(), presentes: new Set(), posicoes: new Set() },
+  provado: {
+    ausentes: new Set(), presentes: new Set(), posicoes: new Set(), colunas: new Set(),
+  },
 };
 
 const chaveRodada = () => `cifra:r:${estado.dia}`;
@@ -337,8 +342,18 @@ function contabilizar() {
 
 // ---------------------------------------------------------------- marcas
 
-/** A marca é de uma casa de um chute, não de uma letra: chave `linha:casa`. */
-const chaveCasa = (l, i) => `${l}:${i}`;
+/**
+ * A chave de uma marca: **coluna + letra**, não a casa.
+ *
+ * Marcar "certa" é dizer *este A, nesta posição*. A afirmação vale para toda
+ * ocorrência do mesmo A na mesma coluna, em qualquer chute — e não vale para o
+ * A noutra coluna, que é uma pergunta diferente. Guardar por coluna faz a marca
+ * aparecer sozinha nos outros chutes sem nunca afirmar demais.
+ *
+ * De quebra, ela alcança chute que ainda nem foi feito: digitou A na casa 2
+ * depois, já nasce marcado.
+ */
+const chaveColuna = (i, letra) => `${i}:${letra}`;
 
 /**
  * A marca que vale para uma casa. O que os chutes provam vence o que a mão
@@ -353,10 +368,11 @@ function marcaDaCasa(l, i) {
   const letra = estado.chutes[l]?.[i];
   if (!letra || letra === BRANCO) return SEM_MARCA;
 
-  // Provada no lugar vence tudo: é a única prova que fala de posição.
-  if (estado.provado.posicoes.has(chaveCasa(l, i))) return CERTA;
+  // Provada no lugar vence tudo: é a única prova que fala de posição. Vale por
+  // coluna, então acende também no mesmo A da mesma casa noutro chute.
+  if (estado.provado.colunas.has(chaveColuna(i, letra))) return CERTA;
   if (estado.provado.ausentes.has(letra)) return ERRADA;
-  const mao = estado.marcas[chaveCasa(l, i)] || SEM_MARCA;
+  const mao = estado.marcas[chaveColuna(i, letra)] || SEM_MARCA;
   // Provada presente: só resta o palpite de posição, e esse é seu.
   if (estado.provado.presentes.has(letra)) return mao === CERTA ? CERTA : MEIO;
   return mao;
@@ -366,9 +382,61 @@ function marcaDaCasa(l, i) {
 function casaProvada(l, i) {
   const letra = estado.chutes[l]?.[i];
   if (!letra || letra === BRANCO) return false;
-  return estado.provado.posicoes.has(chaveCasa(l, i))
+  return estado.provado.colunas.has(chaveColuna(i, letra))
     || estado.provado.ausentes.has(letra)
     || estado.provado.presentes.has(letra);
+}
+
+/**
+ * Junta num só as marcas que a mão pôs nas várias casas de uma mesma letra.
+ *
+ * Elas podem se contradizer — um A marcado certa numa casa e errada noutra é
+ * jogo normal, porque a marca é da ocorrência. O positivo vence: dizer "letra
+ * morta" no teclado quando o jogador a marcou viva em algum lugar seria o
+ * resumo mentindo sobre o que ele mesmo anotou.
+ */
+export function juntarMarcas(marcas) {
+  if (marcas.includes(CERTA)) return CERTA;
+  if (marcas.includes(MEIO)) return MEIO;
+  if (marcas.includes(ERRADA)) return ERRADA;
+  return SEM_MARCA;
+}
+
+/**
+ * O que a tecla de uma letra mostra. É **resumo, não controle**: a marca
+ * continua sendo feita na casa do chute, e clicar na tecla segue digitando.
+ *
+ * Existe porque o teclado é o único lugar da tela onde as 26 letras aparecem
+ * juntas — sem ele, saber se você já descartou o K exige varrer oito linhas.
+ */
+function resumoDaLetra(letra) {
+  if (estado.provado.ausentes.has(letra)) return { marca: ERRADA, provada: true };
+
+  // Varre as colunas onde a letra já apareceu: a marca mora em coluna+letra.
+  const daMao = [];
+  for (let i = 0; i < TAM; i++) {
+    if (!estado.chutes.some((c) => c[i] === letra)) continue;
+    const m = estado.marcas[chaveColuna(i, letra)];
+    if (m) daMao.push(m);
+    if (estado.provado.colunas.has(chaveColuna(i, letra))) daMao.push(CERTA);
+  }
+
+  if (estado.provado.presentes.has(letra)) {
+    return { marca: daMao.includes(CERTA) ? CERTA : MEIO, provada: true };
+  }
+  return { marca: juntarMarcas(daMao), provada: false };
+}
+
+function pintarTeclado() {
+  for (const b of document.querySelectorAll('.tecla')) {
+    const t = b.dataset.tecla;
+    if (!ehLetra(t)) continue;
+    const { marca, provada } = resumoDaLetra(t);
+    b.dataset.marca = marca;
+    b.dataset.provada = provada && marca !== SEM_MARCA ? '1' : '0';
+    b.setAttribute('aria-label',
+      `${t}${['', ' — marcada certa', ' — marcada meio certa', ' — marcada errada'][marca]}`);
+  }
 }
 
 function ciclarCasa(l, i) {
@@ -378,7 +446,7 @@ function ciclarCasa(l, i) {
     avisar('O branco não é letra — não há o que marcar nele.');
     return;
   }
-  if (estado.provado.posicoes.has(chaveCasa(l, i))) {
+  if (estado.provado.colunas.has(chaveColuna(i, letra))) {
     avisar(`Seus chutes já provaram que o ${letra} está exatamente aí.`);
     return;
   }
@@ -388,12 +456,13 @@ function ciclarCasa(l, i) {
   }
 
   const atual = marcaDaCasa(l, i);
-  estado.marcas[chaveCasa(l, i)] = estado.provado.presentes.has(letra)
+  estado.marcas[chaveColuna(i, letra)] = estado.provado.presentes.has(letra)
     ? (atual === CERTA ? MEIO : CERTA)   // provada viva: resta certa ou meio certa
     : (atual + 1) % 4;
 
   guardar();
   desenharTabuleiro();
+  pintarTeclado();
 }
 
 function recalcularProvas() {
@@ -606,6 +675,7 @@ function novaPartida() {
   recalcularProvas();
   atualizarSelo();
   desenharTabuleiro();
+  pintarTeclado();
   avisar(descartada ? 'O vocabulário mudou — a cifra de hoje é outra, e a rodada recomeçou.' : '');
 
   if (estado.fim) setTimeout(() => abrirFim(), 250);
@@ -657,6 +727,7 @@ function enviar() {
 
   guardar();
   desenharTabuleiro();
+  pintarTeclado();
 
   const novas = depois - antes;
   if (!estado.fim && novas > 0) {
@@ -812,6 +883,7 @@ function ligar() {
     estado.marcas = {};
     guardar();
     desenharTabuleiro();
+    pintarTeclado();
     avisar('Marcas à mão apagadas. O que os chutes provam continua.');
   });
 
@@ -902,6 +974,24 @@ function conferir() {
     deduzir(['ABCDE'], 'BCDEA').posicoes.size, 0);
   eq('com branco, prova so as casas digitadas',
     [...deduzir(['GRA_O'], 'GRATO').posicoes].sort(), ['0:0', '0:1', '0:2', '0:4']);
+
+  // A mesma prova, por coluna: é assim que ela alcança os outros chutes — e a
+  // coluna carrega a letra, então nunca acende um A na casa de um O.
+  eq('a prova de posicao vale por coluna+letra',
+    [...deduzir(['GRATO'], 'GRATO').colunas].sort(),
+    ['0:G', '1:R', '2:A', '3:T', '4:O']);
+  eq('a coluna do branco fica de fora',
+    [...deduzir(['GRA_O'], 'GRATO').colunas].sort(), ['0:G', '1:R', '2:A', '4:O']);
+  eq('sem prova de posicao, nenhuma coluna',
+    deduzir(['CASAL'], 'GRATO').colunas.size, 0);
+
+  // O resumo da tecla junta marcas de casas diferentes da mesma letra, que
+  // podem se contradizer. Positivo vence: o teclado não pode dizer "morta"
+  // sobre letra que o jogador marcou viva em algum lugar.
+  eq('resumo: certa vence tudo', juntarMarcas([ERRADA, CERTA, MEIO]), CERTA);
+  eq('resumo: meio certa vence errada', juntarMarcas([ERRADA, MEIO]), MEIO);
+  eq('resumo: so errada continua errada', juntarMarcas([ERRADA, ERRADA]), ERRADA);
+  eq('resumo: sem marca nenhuma', juntarMarcas([]), SEM_MARCA);
 
   eq('nunca prova algo falso', (() => {
     const alvo = 'GRATO';

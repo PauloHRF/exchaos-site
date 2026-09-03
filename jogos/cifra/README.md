@@ -152,8 +152,8 @@ commitado, e o build do site **não** o chama.
 
 | | quantas | corte | tolera ruído? |
 |---|---|---|---|
-| `RESPOSTAS` | 1.742 | freq ≥ 1200 | **não** — resposta obscura é sorteio, não desafio |
-| `EXTRAS` | 6.562 | freq ≥ 30 | **sim** — aceitar vocábulo estranho não custa nada |
+| `RESPOSTAS` | 1.582 | freq ≥ 1200 | **não** — resposta obscura é sorteio, não desafio |
+| `EXTRAS` | 6.722 | freq ≥ 30 | **sim** — aceitar vocábulo estranho não custa nada |
 | aceitas | 8.304 | | |
 
 A assimetria é o truque: recusar palavra real quebra a confiança na regra, então
@@ -161,7 +161,7 @@ o lado que valida chute é generoso; a lista que sorteia o dia é apertada. Um
 corte de frequência separa as duas de uma fonte só, e o ruído de corpus cai todo
 no lado que aguenta.
 
-São 1.742 respostas ≈ **4,8 anos** de rodadas sem repetir palavra.
+São 1.582 respostas ≈ **4,3 anos** de rodadas sem repetir palavra.
 
 ### As três peneiras
 
@@ -174,7 +174,15 @@ São 1.742 respostas ≈ **4,8 anos** de rodadas sem repetir palavra.
 2. **Colisão de acento.** ~5.000 casos, desempatados pela frequência.
 3. **Exclusão à mão.** O que passa nas duas primeiras e ainda não serve como
    resposta: nome próprio compatível com a ortografia (`bruce`, `jorge`),
-   topônimo, palavrão. Só sai das RESPOSTAS — em EXTRAS eles ficam.
+   topônimo, estrangeirismo cru, palavrão. Só sai das RESPOSTAS — em EXTRAS eles
+   ficam, porque continuam sendo coisa que alguém pode digitar.
+
+   Esta lista saiu de uma **revisão das 1.582 respostas uma a uma**, e tinha que
+   sair: a primeira versão foi montada por amostragem e deixou `dubai` chegar a
+   ser a palavra do dia. A peneira ortográfica pega `kenny` e `shawn`, mas
+   `dubai`, `mario` e `judas` são português impecável — não existe regra que os
+   separe de `marco`. Se a fonte ou o corte mudarem, a revisão tem de ser
+   refeita: ela descreve *estas* palavras, não um critério.
 
 Mais um **piso curado**: 37 palavras que legenda de filme não cobre (`jazer`,
 `urgir`, `caiar`, `zelos`) e que já eram aceitas antes. Sem esse piso, trocar de

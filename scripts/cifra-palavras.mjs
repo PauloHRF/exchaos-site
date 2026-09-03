@@ -112,6 +112,52 @@ const FORA_DAS_RESPOSTAS = new Set([
   // palavrão e explícito: ficam aceitos como chute, nunca como resposta do dia
   'merda', 'porra', 'bunda', 'foder', 'vadia', 'pênis', 'bosta', 'cuzão', 'tesão',
   'sêmen', 'seios', 'porno', 'pornô', 'putas', 'putos', 'cuzõe', 'punhe',
+
+  /*
+   * A partir daqui: a revisão completa das 1.742 respostas, feita à mão.
+   *
+   * A lista acima tinha saído de quatro fatias amostradas dos candidatos, e
+   * amostra não fecha conta — `dubai` chegou a sair como palavra do dia. A
+   * peneira ortográfica pega `kenny` e `shawn`, mas `dubai`, `mario` e `judas`
+   * são português ortograficamente impecável: só olho resolve.
+   *
+   * Se o vocabulário for regerado com outra fonte ou outro corte, esta lista
+   * precisa ser revista igual — ela descreve *estas* 1.742 palavras.
+   */
+
+  // nomes de pessoa (legenda é cheia deles)
+  'adams', 'adele', 'aiden', 'andre', 'angus', 'anita', 'ariel', 'arjun', 'artie',
+  'blair', 'bloom', 'boone', 'brien', 'caine', 'chico', 'clare', 'clive', 'cohen',
+  'debra', 'dodge', 'doris', 'edgar', 'elise', 'elton', 'elvis', 'erica', 'ethel',
+  'evans', 'fargo', 'fiona', 'franz', 'fritz', 'gates', 'giles', 'greer', 'hazel',
+  'heidi', 'henri', 'hilda', 'hogan', 'jaime', 'joana', 'jonas', 'judas', 'julio',
+  'laden',
+  'leela', 'leila', 'linus', 'lorna', 'louie', 'lucia', 'luigi', 'mabel', 'marge',
+  'margo', 'mario', 'mateo', 'maura', 'mcgee', 'moore', 'moran', 'morse', 'nadia',
+  'naomi', 'niles', 'nixon', 'nolan', 'obama', 'olive', 'orson', 'pablo', 'paige',
+  'paolo', 'pearl', 'perez', 'petra', 'piper', 'pooja', 'rahul', 'raven', 'reese',
+  'renee', 'roman', 'romeo', 'rossi', 'ruben', 'rufus', 'sasha', 'silva', 'slade',
+  'sloan', 'sofia', 'sonia', 'stein', 'susie', 'tessa', 'vinci', 'zelda',
+
+  // topônimos
+  'bagdá', 'bronx', 'cairo', 'dubai', 'havaí', 'madri', 'milão',
+
+  // mitologia, ficção e marca
+  'alien', 'atena', 'gohan', 'hades', 'jutsu', 'nobel', 'satan', 'shiva', 'tesla',
+  'chili',
+
+  // estrangeirismo cru — os já assentados (jeans, sushi, tango, ninja, vodca)
+  // ficam, porque são palavra do português corrente
+  'alpha', 'chefs', 'close', 'color', 'cross', 'dream', 'drive', 'games', 'girls',
+  'grove', 'lemon', 'mouse', 'nerds', 'never', 'omega', 'place', 'plaza', 'prime',
+  'queen', 'rider', 'ridge', 'river', 'rover', 'señor', 'shore', 'stars', 'steel',
+  'voice',
+  'facto',   // grafia de Portugal; no Brasil é "fato"
+  'qualé',   // contração de fala, não palavra
+
+  // vulgar, escatológico e pejorativo: aceitos como chute, nunca sorteados
+  'bicha', 'cagar', 'chupa', 'fodeu', 'fuder', 'gozar', 'mijar', 'negão', 'orgia',
+  'peido', 'pinto', 'tetas', 'veado', 'viado',
 ].map(semAcento));
 
 /**
