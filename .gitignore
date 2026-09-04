@@ -4,3 +4,4 @@ dist/
 .DS_Store
 scripts/.cache-frequencia.txt
 .wrangler/
+scripts/.cache-fontes/

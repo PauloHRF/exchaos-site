@@ -4,17 +4,27 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Jogos — ExChaos</title>
-<meta name="description" content="Os jogos de navegador da ExChaos.">
+<meta name="description" content="Os jogos de navegador da ExChaos: um jogo novo por dia, de graça e sem instalar nada.">
+<link rel="canonical" href="https://exchaos.com.br/jogos/">
+<meta property="og:site_name" content="ExChaos">
+<meta property="og:locale" content="pt_BR">
 <meta property="og:title" content="Jogos — ExChaos">
 <meta property="og:description" content="Os jogos de navegador da ExChaos. Do caos, mundos.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://exchaos.com.br/jogos/">
-<meta property="og:image" content="https://exchaos.com.br/assets/brand/exchaos-favicon-512.png">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://exchaos.com.br/assets/brand/og/og-jogos.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="O selo da ExChaos ao lado da palavra Jogos.">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/assets/brand/exchaos-favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/assets/brand/exchaos-favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="/assets/brand/exchaos-favicon-180.png">
 <link rel="stylesheet" href="/assets/brand/exchaos.css">
+
+<!-- A lista em dados estruturados; o build escreve no lugar desta marca. -->
+<!--DADOS-->
+
 <style>
   .head{display:flex;align-items:center;gap:16px;margin-bottom:8px}
   .head img{width:52px;height:52px;flex:none}
@@ -51,25 +61,32 @@
     </div>
     <p class="sub">Do caos, mundos.</p>
 
-    <div id="grid" class="grid" aria-live="polite"></div>
+    <!--
+      Os cartões vêm prontos daqui: o `construir.mjs` escreve o HTML deles no
+      lugar da marca abaixo, a partir do mesmo `jogos.json`. O script no fim da
+      página continua existindo para quem abre este arquivo sem build.
+    -->
+    <div id="grid" class="grid" aria-live="polite"><!--CARTOES--></div>
   </div>
 
   <script>
     const grid = document.getElementById('grid');
 
-    function card(j){
-      const el = document.createElement('a');
-      el.className = 'card';
-      el.href = `/jogos/${j.slug}/`;
-      const status = j.status === 'no-ar' ? 'no-ar' : 'em-breve';
-      const rotulo = status === 'no-ar' ? 'Jogar' : 'Em breve';
-      el.innerHTML = `
-        <h3></h3>
-        <p></p>
-        <span class="status status--${status}">${rotulo}</span>`;
-      el.querySelector('h3').textContent = j.titulo || j.slug;
-      el.querySelector('p').textContent = j.descricao || '';
-      return el;
+    // Com os cartões já no HTML, não há o que buscar: o build passou por aqui.
+    if (grid.children.length === 0) {
+      function card(j){
+        const el = document.createElement('a');
+        el.className = 'card';
+        el.href = `/jogos/${j.slug}/`;
+        const status = j.status === 'no-ar' ? 'no-ar' : 'em-breve';
+        const rotulo = status === 'no-ar' ? 'Jogar' : 'Em breve';
+        el.innerHTML = `
+          <h3></h3>
+          <p></p>
+          <span class="status status--${status}">${rotulo}</span>`;
+        el.querySelector('h3').textContent = j.titulo || j.slug;
+        el.querySelector('p').textContent = j.descricao || '';
+        return el;
     }
 
     fetch('/jogos/jogos.json')
@@ -87,6 +104,7 @@
           'abrir o arquivo direto bloqueia o carregamento do JSON.</p>';
         console.error(err);
       });
+    }
   </script>
 </body>
 </html>

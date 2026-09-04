@@ -1,0 +1,12 @@
+# ExChaos — o que os robôs podem ler.
+#
+# A Cloudflare anexa a este arquivo o bloco dela, entre as marcas "Cloudflare
+# Managed content", com as regras dos robôs de IA (GPTBot, ClaudeBot,
+# Google-Extended e companhia). Aquilo se mexe no painel da Cloudflare, não
+# aqui. Este arquivo é a parte que é nossa — e existe sobretudo pela última
+# linha: sem `Sitemap:`, o sitemap só é encontrado se alguém o enviar à mão.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://exchaos.com.br/sitemap.xml

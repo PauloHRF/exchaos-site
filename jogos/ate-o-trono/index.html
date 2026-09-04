@@ -14,6 +14,9 @@
       desta página: quem lê estas marcas é o servidor do WhatsApp ou do
       Twitter, que não tem a página aberta para resolver caminho relativo.
     -->
+    <link rel="canonical" href="https://exchaos.com.br/jogos/ate-o-trono/" />
+    <meta property="og:site_name" content="ExChaos" />
+    <meta property="og:locale" content="pt_BR" />
     <meta property="og:title" content="Até o Trono — ExChaos" />
     <meta
       property="og:description"
@@ -23,9 +26,15 @@
     <meta property="og:url" content="https://exchaos.com.br/jogos/ate-o-trono/" />
     <meta
       property="og:image"
-      content="https://exchaos.com.br/assets/brand/exchaos-favicon-512.png"
+      content="https://exchaos.com.br/assets/brand/og/og-ate-o-trono.png"
     />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Até o Trono — jogo diário de estratégia da ExChaos."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
 
     <!--
       Caminhos relativos, como todo o resto do site: o `base: './'` do Vite
@@ -51,6 +60,21 @@
     />
 
     <link rel="stylesheet" href="/src/estilo.css" />
+
+    <!--
+      Dados estruturados: dizem ao Google que esta página **é um jogo**, com
+      nome, gênero e preço, e não uma página qualquer que fala de um. É o que
+      permite a ele mostrar isto como jogo e associar à marca declarada na home.
+    -->
+    <script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+{"@type":"VideoGame","@id":"https://exchaos.com.br/jogos/ate-o-trono/#jogo","name":"Até o Trono","url":"https://exchaos.com.br/jogos/ate-o-trono/","description":"Recrute cinco heróis de todas as eras e despache esquadrões contra sete missões. O difícil não é vencer uma — é ainda ter gente de pé na última.","image":"https://exchaos.com.br/assets/brand/og/og-ate-o-trono.png","inLanguage":"pt-BR","genre":["RPG","Estratégia","Jogo diário"],"gamePlatform":"Navegador web","playMode":"SinglePlayer","applicationCategory":"GameApplication","operatingSystem":"Qualquer navegador","publisher":{"@id":"https://exchaos.com.br/#marca"},"offers":{"@type":"Offer","price":"0","priceCurrency":"BRL","availability":"https://schema.org/InStock"}},
+{"@type":"BreadcrumbList","itemListElement":[
+{"@type":"ListItem","position":1,"name":"ExChaos","item":"https://exchaos.com.br/"},
+{"@type":"ListItem","position":2,"name":"Jogos","item":"https://exchaos.com.br/jogos/"},
+{"@type":"ListItem","position":3,"name":"Até o Trono"}]}
+]}
+    </script>
   </head>
   <body>
     <div id="app"></div>

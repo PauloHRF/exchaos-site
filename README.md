@@ -1,6 +1,8 @@
 # ExChaos — site
 
-Portal de jogos de navegador. Deploy no Cloudflare Pages (push-to-deploy).
+Portal de jogos de navegador. Deploy no Cloudflare **Workers** (push-to-deploy):
+um Worker só de arquivos estáticos, configurado no `wrangler.jsonc` — é por
+isso que o painel não mostra campo de *output directory*.
 
 ## Estrutura
 
@@ -8,17 +10,20 @@ Portal de jogos de navegador. Deploy no Cloudflare Pages (push-to-deploy).
 .
 ├─ index.html            # landing
 ├─ 404.html              # página de erro (no tema)
+├─ robots.txt            # a parte que é nossa; a Cloudflare anexa a dela
 ├─ assets/brand/         # a marca, num lugar só
 │  ├─ exchaos.css        # tokens (cores, fontes) + componentes base
 │  ├─ exchaos-favicon.svg / -32.png / -180.png
-│  └─ exchaos-mark.svg / -mono.svg
+│  ├─ exchaos-mark.svg / -mono.svg
+│  └─ og/                # cartões de compartilhamento (1200x630)
 ├─ jogos/
 │  ├─ index.html         # o portal: lista os jogos (lê jogos.json)
 │  ├─ jogos.json         # catálogo — adicione entradas aqui
 │  ├─ cifra/             # jogo estático: HTML, CSS e JS soltos
 │  └─ ate-o-trono/       # jogo com build: tem package.json
 └─ scripts/
-   ├─ construir.mjs     # monta o dist/
+   ├─ construir.mjs      # monta o dist/ (e o sitemap, e o catálogo)
+   ├─ cartoes-og.py      # desenha os cartões de compartilhamento (à mão)
    └─ cifra-palavras.mjs # gera o vocabulário da Cifra (roda à mão)
 ```
 
@@ -48,9 +53,43 @@ Cada jogo com build tem os seus próprios comandos, rodados de dentro da pasta
 dele. No Até o Trono: `npm run conferir` (as checagens) e `npm run despachar`
 (a calibragem).
 
-**No Cloudflare Pages:** *build command* `npm run build`, *output directory*
-`dist`. Se o build falhar, o Pages mantém o último deploy bem-sucedido no ar —
-ele não derruba o site, apenas não atualiza.
+**No Cloudflare:** *build command* `npm run build`; a pasta publicada é a que o
+`wrangler.jsonc` declara (`./dist`), não um campo do painel. Se o build falhar,
+o último deploy bem-sucedido continua no ar — ele não derruba o site, apenas
+não atualiza.
+
+## Ser encontrado
+
+O site é pequeno demais para ranquear sozinho; o que existe aqui é a parte que
+não pode faltar, para o Google não ter desculpa e para um link compartilhado
+render.
+
+- **`robots.txt`** (raiz) — nosso conteúdo é praticamente só a linha `Sitemap:`.
+  As regras dos robôs de IA **não estão aqui**: a Cloudflare anexa o bloco dela
+  a este arquivo, e aquilo se mexe no painel dela.
+- **`sitemap.xml`** — gerado pelo `construir.mjs` a partir do `jogos.json`, e só
+  com jogo que já tem página em `dist/`. Jogo novo entra sozinho. Sem `lastmod`:
+  a única data que o build teria é a do próprio build, e sitemap que jura que
+  tudo mudou hoje é sitemap em que o Google para de acreditar.
+- **`<link rel="canonical">`** em toda página — sem ela, cada forma de chegar
+  na mesma página (com e sem barra, com parâmetro de campanha no fim) vira uma
+  página diferente aos olhos do Google, e a força se divide entre cópias.
+- **Dados estruturados** (`application/ld+json`) — `Organization` + `WebSite` na
+  home, `CollectionPage` gerado no catálogo, e `VideoGame` + `BreadcrumbList`
+  escrito na página de cada jogo. Só o catálogo é gerado, porque a lista de
+  jogos não pode divergir do `jogos.json`; o resto é pouco e fica à mão.
+- **Cartões de compartilhamento** — `assets/brand/og/*.png`, 1200x630, com
+  `twitter:card` `summary_large_image`. Desenhados pelo
+  `scripts/cartoes-og.py`, que **não faz parte do build**: jogo novo, cartão
+  novo, rodado à mão.
+- **O catálogo vai pronto no HTML.** A grade de `/jogos/` era montada com
+  `fetch` no navegador, e quem lê a página sem rodar JS — o Googlebot na
+  primeira passada, o robô que faz a prévia do link no WhatsApp — recebia a
+  única página que lista os jogos vazia. O `construir.mjs` escreve os cartões
+  no lugar da marca `<!--CARTOES-->`; o script da página só age se achar a
+  grade vazia, que é o caso de quem abre o arquivo sem build.
+
+O `404.html` é `noindex`: página de erro não é conteúdo.
 
 ## Adicionar um jogo
 

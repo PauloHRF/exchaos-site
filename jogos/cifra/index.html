@@ -5,16 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cifra — ExChaos</title>
 <meta name="description" content="Oito tentativas para uma palavra de cinco letras. O oráculo conta quantas você acertou — nunca diz quais.">
+<link rel="canonical" href="https://exchaos.com.br/jogos/cifra/">
+<meta property="og:site_name" content="ExChaos">
+<meta property="og:locale" content="pt_BR">
 <meta property="og:title" content="Cifra — ExChaos">
 <meta property="og:description" content="Oito tentativas para uma palavra de cinco letras. O oráculo conta quantas você acertou — nunca diz quais.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://exchaos.com.br/jogos/cifra/">
-<meta property="og:image" content="https://exchaos.com.br/assets/brand/exchaos-favicon-512.png">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://exchaos.com.br/assets/brand/og/og-cifra.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Cifra — jogo diário de palavras da ExChaos.">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/assets/brand/exchaos-favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/brand/exchaos-favicon-180.png">
 <link rel="stylesheet" href="/assets/brand/exchaos.css">
 <link rel="stylesheet" href="./estilo.css">
+
+<!--
+  Dados estruturados: dizem ao Google que esta página **é um jogo**, com
+  nome, gênero e preço, e não uma página qualquer que fala de um. É o que
+  permite a ele mostrar isto como jogo e associar à marca declarada na home.
+-->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+{"@type":"VideoGame","@id":"https://exchaos.com.br/jogos/cifra/#jogo","name":"Cifra","url":"https://exchaos.com.br/jogos/cifra/","description":"Cinco letras, oito tentativas. O oráculo conta quantas você acertou e nunca diz quais — descobrir o quê é o jogo inteiro.","image":"https://exchaos.com.br/assets/brand/og/og-cifra.png","inLanguage":"pt-BR","genre":["Jogo de palavras","Dedução","Jogo diário"],"gamePlatform":"Navegador web","playMode":"SinglePlayer","applicationCategory":"GameApplication","operatingSystem":"Qualquer navegador","publisher":{"@id":"https://exchaos.com.br/#marca"},"offers":{"@type":"Offer","price":"0","priceCurrency":"BRL","availability":"https://schema.org/InStock"}},
+{"@type":"BreadcrumbList","itemListElement":[
+{"@type":"ListItem","position":1,"name":"ExChaos","item":"https://exchaos.com.br/"},
+{"@type":"ListItem","position":2,"name":"Jogos","item":"https://exchaos.com.br/jogos/"},
+{"@type":"ListItem","position":3,"name":"Cifra"}]}
+]}
+</script>
 </head>
 <body>
 
@@ -48,7 +69,6 @@
   <p class="dica-teclado">
     clique numa letra já chutada para marcar
     <b class="ex ex--1">certa</b> <b class="ex ex--2">meio certa</b> <b class="ex ex--3">errada</b>
-    — vale para a mesma letra na mesma casa, em todos os chutes
     · <button type="button" id="btn-limpar-marcas">limpar marcas</button>
   </p>
 </main>

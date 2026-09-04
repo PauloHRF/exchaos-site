@@ -5,12 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ExChaos — From chaos, worlds.</title>
 <meta name="description" content="Jogos de navegador nascidos do caos. ExChaos — from chaos, worlds.">
-<meta property="og:title" content="ExChaos">
+
+<!--
+  A canônica diz ao Google qual é o endereço verdadeiro desta página. Sem ela,
+  cada forma de chegar aqui (com e sem barra, com e sem www, com parâmetro de
+  campanha colado no fim) é uma página diferente aos olhos dele, e a força se
+  divide entre cópias.
+-->
+<link rel="canonical" href="https://exchaos.com.br/">
+
+<!--
+  As `og:` usam URL absoluta: quem lê estas marcas é o servidor do WhatsApp ou
+  do Twitter, que não tem a página aberta para resolver caminho relativo.
+  A imagem é 1200x630 — a proporção que vira cartão grande no compartilhamento.
+-->
+<meta property="og:site_name" content="ExChaos">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:title" content="ExChaos — jogos diários de navegador">
 <meta property="og:description" content="Jogos de navegador nascidos do caos. From chaos, worlds.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://exchaos.com.br">
-<meta property="og:image" content="https://exchaos.com.br/assets/brand/exchaos-favicon-512.png">
-<meta name="twitter:card" content="summary">
+<meta property="og:url" content="https://exchaos.com.br/">
+<meta property="og:image" content="https://exchaos.com.br/assets/brand/og/og-exchaos.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="O selo da ExChaos e a frase From chaos, worlds.">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/assets/brand/exchaos-favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/assets/brand/exchaos-favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="/assets/brand/exchaos-favicon-180.png">
@@ -46,6 +65,18 @@
   @keyframes spin{to{transform:rotate(360deg)}}
   @media (prefers-reduced-motion:reduce){main{animation:none}.glow{animation:none}.ring-spin{animation:none}}
 </style>
+
+<!--
+  Dados estruturados: é como o Google sabe que ExChaos é uma marca de jogos e
+  não uma palavra solta. O `@id` deixa as outras páginas apontarem para esta
+  mesma entidade em vez de declararem uma marca nova cada uma.
+-->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+{"@type":"Organization","@id":"https://exchaos.com.br/#marca","name":"ExChaos","url":"https://exchaos.com.br/","logo":"https://exchaos.com.br/assets/brand/exchaos-favicon-512.png","email":"contato@exchaos.com.br","sameAs":["https://instagram.com/PlayExChaos"],"description":"Jogos diários de navegador, em português."},
+{"@type":"WebSite","@id":"https://exchaos.com.br/#site","url":"https://exchaos.com.br/","name":"ExChaos","inLanguage":"pt-BR","publisher":{"@id":"https://exchaos.com.br/#marca"}}
+]}
+</script>
 </head>
 <body>
   <main>
