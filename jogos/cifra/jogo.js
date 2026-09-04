@@ -149,6 +149,40 @@ export function pontuar(chute, alvo) {
   return { lugar: verde, palavra: amarelo, fora: digitadas - verde - amarelo };
 }
 
+/**
+ * O veredito de um chute, letra por letra. **Só existe depois que a partida
+ * acaba** — durante o jogo, dizer quais letras acertaram é exatamente o que a
+ * Cifra não faz.
+ *
+ * Usa a mesma contagem por multiconjunto do `pontuar`, e isso não é capricho:
+ * as cores precisam somar exatamente os três números que ficaram na linha o
+ * jogo inteiro. Se o chute tem dois A e a resposta tem um, só um acende —
+ * senão a revelação desmentiria o placar que o jogador passou oito tentativas
+ * lendo.
+ */
+export function veredito(chute, alvo) {
+  const estados = Array(TAM).fill(SEM_MARCA);
+  const disponivel = new Map();
+
+  for (let i = 0; i < TAM; i++) {
+    if (chute[i] !== BRANCO && chute[i] === alvo[i]) estados[i] = CERTA;
+    else disponivel.set(alvo[i], (disponivel.get(alvo[i]) || 0) + 1);
+  }
+
+  for (let i = 0; i < TAM; i++) {
+    if (chute[i] === BRANCO || estados[i] === CERTA) continue;
+    const n = disponivel.get(chute[i]) || 0;
+    if (n > 0) {
+      disponivel.set(chute[i], n - 1);
+      estados[i] = MEIO;
+    } else {
+      estados[i] = ERRADA;
+    }
+  }
+
+  return estados;
+}
+
 /** `null` quando o chute vale; a frase da recusa quando não. */
 export function motivoRecusa(chute) {
   if (chute.length < TAM || chute.includes(' ')) return 'Faltam letras.';
@@ -249,7 +283,9 @@ const estado = {
   cursor: 0,
   fim: null,
   contabilizada: false,
-  marcas: {},          // as marcas postas à mão
+  marcas: {},          // `casa:letra` -> certa ou meio certa. Posicional.
+  mortas: new Set(),   // letras marcadas erradas à mão. Valem em todo lugar.
+  vereditos: null,     // a verdade letra a letra. Só existe com a partida encerrada.
   provado: {
     ausentes: new Set(), presentes: new Set(), posicoes: new Set(), colunas: new Set(),
   },
@@ -283,6 +319,7 @@ function guardar() {
   try {
     localStorage.setItem(chaveRodada(), JSON.stringify({
       chutes: estado.chutes, fim: estado.fim, marcas: estado.marcas,
+      mortas: [...estado.mortas],   // Set não sobrevive ao JSON
       contabilizada: estado.contabilizada, alvo: impressao(estado.alvo),
     }));
   } catch { /* modo privativo, cota cheia — o jogo continua, só não lembra */ }
@@ -355,6 +392,18 @@ function contabilizar() {
  */
 const chaveColuna = (i, letra) => `${i}:${letra}`;
 
+/*
+ * A exceção: **errada** não é posicional.
+ *
+ * "Certa" e "meio certa" falam da letra *naquele lugar*, e por isso moram em
+ * coluna+letra. "Errada" fala outra coisa — diz que a letra não está na
+ * palavra —, e isso não tem coluna: vale para todo A, em todo chute, inclusive
+ * nos que ainda vão acontecer. Prendê-la à coluna obrigava a matar a mesma
+ * letra cinco vezes, uma por casa, para dizer uma coisa só.
+ *
+ * Por isso ela mora num conjunto de letras, separado das outras duas.
+ */
+
 /**
  * A marca que vale para uma casa. O que os chutes provam vence o que a mão
  * marcou: deixar você anotar "certa" numa letra que os seus próprios chutes já
@@ -368,13 +417,19 @@ function marcaDaCasa(l, i) {
   const letra = estado.chutes[l]?.[i];
   if (!letra || letra === BRANCO) return SEM_MARCA;
 
+  // Acabou a partida: a verdade cobre tudo. Marca e prova viram história.
+  if (estado.vereditos) return estado.vereditos[l][i];
+
   // Provada no lugar vence tudo: é a única prova que fala de posição. Vale por
   // coluna, então acende também no mesmo A da mesma casa noutro chute.
   if (estado.provado.colunas.has(chaveColuna(i, letra))) return CERTA;
   if (estado.provado.ausentes.has(letra)) return ERRADA;
+
   const mao = estado.marcas[chaveColuna(i, letra)] || SEM_MARCA;
-  // Provada presente: só resta o palpite de posição, e esse é seu.
+  // Provada presente vence a mão morta: a prova sabe mais que o palpite.
   if (estado.provado.presentes.has(letra)) return mao === CERTA ? CERTA : MEIO;
+
+  if (estado.mortas.has(letra)) return ERRADA;
   return mao;
 }
 
@@ -382,6 +437,8 @@ function marcaDaCasa(l, i) {
 function casaProvada(l, i) {
   const letra = estado.chutes[l]?.[i];
   if (!letra || letra === BRANCO) return false;
+  // No fim tudo é verdade, e o ponto distinguia prova de palpite — some junto.
+  if (estado.vereditos) return false;
   return estado.provado.colunas.has(chaveColuna(i, letra))
     || estado.provado.ausentes.has(letra)
     || estado.provado.presentes.has(letra);
@@ -410,6 +467,18 @@ export function juntarMarcas(marcas) {
  * juntas — sem ele, saber se você já descartou o K exige varrer oito linhas.
  */
 function resumoDaLetra(letra) {
+  // Acabou: a tecla mostra o que a letra era de fato, juntando o veredito de
+  // todas as casas onde ela apareceu.
+  if (estado.vereditos) {
+    const verdades = [];
+    estado.chutes.forEach((chute, l) => {
+      for (let i = 0; i < TAM; i++) {
+        if (chute[i] === letra) verdades.push(estado.vereditos[l][i]);
+      }
+    });
+    return { marca: juntarMarcas(verdades), provada: false };
+  }
+
   if (estado.provado.ausentes.has(letra)) return { marca: ERRADA, provada: true };
 
   // Varre as colunas onde a letra já apareceu: a marca mora em coluna+letra.
@@ -424,6 +493,7 @@ function resumoDaLetra(letra) {
   if (estado.provado.presentes.has(letra)) {
     return { marca: daMao.includes(CERTA) ? CERTA : MEIO, provada: true };
   }
+  if (estado.mortas.has(letra)) return { marca: ERRADA, provada: false };
   return { marca: juntarMarcas(daMao), provada: false };
 }
 
@@ -442,6 +512,8 @@ function pintarTeclado() {
 function ciclarCasa(l, i) {
   const letra = estado.chutes[l]?.[i];
   if (!letra) return;
+  // Com a partida encerrada não há o que anotar: o tabuleiro já mostra tudo.
+  if (estado.vereditos) return;
   if (letra === BRANCO) {
     avisar('O branco não é letra — não há o que marcar nele.');
     return;
@@ -456,9 +528,26 @@ function ciclarCasa(l, i) {
   }
 
   const atual = marcaDaCasa(l, i);
-  estado.marcas[chaveColuna(i, letra)] = estado.provado.presentes.has(letra)
-    ? (atual === CERTA ? MEIO : CERTA)   // provada viva: resta certa ou meio certa
-    : (atual + 1) % 4;
+
+  // Provada viva: só resta escolher entre certa e meio certa. Errada está fora
+  // de questão — a prova já disse que a letra está lá.
+  if (estado.provado.presentes.has(letra)) {
+    estado.marcas[chaveColuna(i, letra)] = atual === CERTA ? MEIO : CERTA;
+  } else {
+    const proximo = (atual + 1) % 4;
+
+    if (proximo === ERRADA) {
+      // A letra morre inteira, em todas as casas. E as marcas de posição dela
+      // saem junto: dizer "não está na palavra" contradiz qualquer palpite de
+      // onde ela estaria.
+      estado.mortas.add(letra);
+      for (let c = 0; c < TAM; c++) delete estado.marcas[chaveColuna(c, letra)];
+    } else {
+      estado.mortas.delete(letra);
+      if (proximo === SEM_MARCA) delete estado.marcas[chaveColuna(i, letra)];
+      else estado.marcas[chaveColuna(i, letra)] = proximo;
+    }
+  }
 
   guardar();
   desenharTabuleiro();
@@ -467,6 +556,11 @@ function ciclarCasa(l, i) {
 
 function recalcularProvas() {
   estado.provado = deduzir(estado.chutes, estado.alvo);
+  // Acabou a partida: a verdade de cada letra passa a existir e substitui
+  // marca e prova no tabuleiro. Antes disso é `null`, e nada a consulta.
+  estado.vereditos = estado.fim
+    ? estado.chutes.map((c) => veredito(c, estado.alvo))
+    : null;
 }
 
 // ---------------------------------------------------------------- desenho
@@ -668,6 +762,7 @@ function novaPartida() {
   estado.fim = serve ? salvo.fim : null;
   estado.contabilizada = serve ? Boolean(salvo.contabilizada) : false;
   estado.marcas = serve ? (salvo.marcas ?? {}) : {};
+  estado.mortas = new Set(serve ? (salvo.mortas ?? []) : []);
   if (descartada) guardar();
   estado.atual = Array(TAM).fill(null);
   estado.cursor = 0;
@@ -881,6 +976,7 @@ function ligar() {
 
   $('#btn-limpar-marcas').addEventListener('click', () => {
     estado.marcas = {};
+    estado.mortas.clear();
     guardar();
     desenharTabuleiro();
     pintarTeclado();
@@ -938,6 +1034,26 @@ function conferir() {
   eq('branco nao entra na soma', somaDe(pontuar('CAS_L', 'CASAL')), 4);
   eq('branco nao vira acerto', pontuar('CAS_L', 'CASAL'), { lugar: 4, palavra: 0, fora: 0 });
   eq('letra sob o branco ainda casa amarelo', pontuar('_AAAA', 'ABCDE').palavra, 1);
+
+  // A revelação do fim. A invariante é uma só e é a que importa: as cores têm
+  // de somar exatamente os três números que a linha mostrou o jogo inteiro.
+  const contar = (v, m) => v.filter((x) => x === m).length;
+  const bateComOPlacar = (chute, alvo) => {
+    const v = veredito(chute, alvo);
+    const p = pontuar(chute, alvo);
+    return contar(v, CERTA) === p.lugar
+      && contar(v, MEIO) === p.palavra
+      && contar(v, ERRADA) === p.fora;
+  };
+  eq('veredito bate com o placar: acerto cheio', bateComOPlacar('CASAL', 'CASAL'), true);
+  eq('veredito bate com o placar: erro cheio', bateComOPlacar('MUITO', 'CASAL'), true);
+  eq('veredito bate com o placar: repetida no chute', bateComOPlacar('AAAAA', 'CASAL'), true);
+  eq('veredito bate com o placar: repetida nos dois', bateComOPlacar('SALAS', 'CASAL'), true);
+  eq('veredito bate com o placar: com branco', bateComOPlacar('CAS_L', 'CASAL'), true);
+  eq('veredito bate com o placar: anagrama', bateComOPlacar('ABCDE', 'BCDEA'), true);
+  eq('o branco nao ganha cor', veredito('CAS_L', 'CASAL')[3], SEM_MARCA);
+  eq('a repetida a mais nao acende',
+    veredito('AAAAA', 'CASAL'), [ERRADA, CERTA, ERRADA, CERTA, ERRADA]);
 
   eq('recusa palavra fora do dicionario', motivoRecusa('XXXXX') !== null, true);
   eq('aceita palavra do dicionario', motivoRecusa('CASAL'), null);
